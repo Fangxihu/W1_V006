@@ -1,0 +1,7 @@
+file=bt1
+
+# Panic on fault
+PSKEY_PANIC_ON_FAULT = FALSE
+
+# LC enable watchdog fault
+PSKEY_LC_ENABLE_WATCHDOG_FAULT = TRUE

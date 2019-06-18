@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project name="apps0_firmware" path="" locked="no">
+    <file path="1365/apps_p0_firmware.xuv"/>
+    <configurations defaultKit="kitres://{54bf1f98-0f7c-4619-aa3a-efc0d07fa8bb}">
+        <configuration name="prebuilt_image" kit="kitres://{54bf1f98-0f7c-4619-aa3a-efc0d07fa8bb}" options="deploy|default">
+            <devkitConfiguration>prebuilt_image</devkitConfiguration>
+            <devkitPath>E:/qtil/ADK_QCC512x_QCC302x_WIN_6.3.0.154</devkitPath>
+            <devkitGroup>kitres://{bbac163c-41be-4ce7-b236-236f15ff18ca}</devkitGroup>
+            <deployProject>deploy</deployProject>
+            <devkitRevision>1535980931</devkitRevision>
+            <property name="BUILD_TYPE">DO_NOT_BUILD</property>
+            <property name="OUTPUT_TYPE">NONE</property>
+            <property name="SUBSYSTEM_NAME">apps0</property>
+        </configuration>
+        <configuration name="prebuilt_image" kit="kitres://{72f9104a-225e-4fe9-a320-666c9faf24a6}" options="deploy|default">
+            <devkitConfiguration>prebuilt_image</devkitConfiguration>
+            <devkitPath>E:/qtil/ADK_QCC512X_QCC302X_WIN_6.3.2.36</devkitPath>
+            <devkitGroup>kitres://{bbac163c-41be-4ce7-b236-236f15ff18ca}</devkitGroup>
+            <deployProject>deploy</deployProject>
+            <devkitRevision>1557218675</devkitRevision>
+            <property name="BUILD_TYPE">DO_NOT_BUILD</property>
+            <property name="OUTPUT_TYPE">NONE</property>
+            <property name="SUBSYSTEM_NAME">apps0</property>
+        </configuration>
+    </configurations>
+</project>

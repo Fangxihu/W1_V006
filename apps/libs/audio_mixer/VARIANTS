@@ -1,0 +1,5 @@
+
+VARIANTS := dual_core
+
+# Include dual_core
+CFLAGS_dual_core := -DUSE_SECOND_CORE

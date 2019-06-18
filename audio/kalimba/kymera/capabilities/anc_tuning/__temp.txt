@@ -1,0 +1,24 @@
+# A Perforce Label Specification.
+#
+#  Label:       The label name.
+#  Update:      The date this specification was last modified.
+#  Access:      The date of the last 'labelsync' on this label.
+#  Owner:       The user who created this label.
+#  Description: A short description of the label (optional).
+#  Options:     Label update options: locked or unlocked.
+#  View:        Lines to select depot files for the label.
+#
+# Use 'p4 help label' to see more about label views.
+
+Label:	svc-audio-dspsw_download_5394_201808301726
+
+Owner:	svc-audio-cpu
+
+Description:
+	Created by svc-audio-cpu.
+
+Options:	unlocked noautoreload
+
+View:
+	//depot/...
+

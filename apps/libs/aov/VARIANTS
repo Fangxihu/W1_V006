@@ -1,0 +1,7 @@
+
+VARIANTS :=  debug
+
+# Include DEBUG
+CFLAGS_debug := -DAOV_DEBUG_LIB
+
+

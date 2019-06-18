@@ -1,0 +1,32 @@
+# A Perforce Change Specification.
+#
+#  Change:      The change number. 'new' on a new changelist.
+#  Date:        The date this specification was last modified.
+#  Client:      The client on which the changelist was created.  Read-only.
+#  User:        The user who created the changelist.
+#  Status:      Either 'pending' or 'submitted'. Read-only.
+#  Type:        Either 'public' or 'restricted'. Default is 'public'.
+#  Description: Comments about the changelist.  Required.
+#  ImportedBy:  The user who fetched or pushed this change to this server.
+#  Identity:    Identifier for this change.
+#  Jobs:        What opened jobs are to be closed by this changelist.
+#               You may delete jobs from this list.  (New changelists only.)
+#  Files:       What opened files from the default changelist are to be added
+#               to this changelist.  You may delete files from this list.
+#               (New changelists only.)
+
+Change:	new
+
+Client:	svc_audio_dspsw_unix__download_20180830172613_vs07
+
+User:	svc-audio-cpu
+
+Status:	new
+
+Description:
+    Allocate version number for KCS 4786
+
+Files:
+	//depot/dspsw/main/kalimba/kymera/BUILDS.txt	# edit
+	//depot/dspsw/main/kalimba/kymera/ID.txt	# edit
+

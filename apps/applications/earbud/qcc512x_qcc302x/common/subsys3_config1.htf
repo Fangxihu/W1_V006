@@ -1,0 +1,8 @@
+file=audio1
+
+# Select PIOs for I2S interface 1: SCK, WS, MCLK, SD_OUT, SD_IN.
+Pcm1PioConfig = [3E 3D 36 3A 38]
+
+CoreEnable = [00]
+
+CodecOutputDisableTimeout = 59000000

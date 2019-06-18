@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project name="deploy" path="" locked="no">
+    <configurations defaultKit="kitres://{54bf1f98-0f7c-4619-aa3a-efc0d07fa8bb}">
+        <configuration name="deploy" kit="kitres://{54bf1f98-0f7c-4619-aa3a-efc0d07fa8bb}" options="deploy|default">
+            <devkitConfiguration>application</devkitConfiguration>
+            <devkitPath>E:/qtil/ADK_QCC512x_QCC302x_WIN_6.3.0.154</devkitPath>
+            <devkitGroup>kitres://{bbac163c-41be-4ce7-b236-236f15ff18ca}</devkitGroup>
+            <deployProject></deployProject>
+            <devkitRevision>1535980931</devkitRevision>
+            <property name="DEFS">AURA</property>
+            <property name="INCPATHS">sdk://apps/include/*.h;include/adk/*.h</property>
+            <property name="PRIVATE_DEFS">AURA</property>
+            <property name="PRIVATE_INCPATHS">include/*.h</property>
+        </configuration>
+        <configuration name="deploy" kit="kitres://{72f9104a-225e-4fe9-a320-666c9faf24a6}" options="deploy|default">
+            <devkitConfiguration>application</devkitConfiguration>
+            <devkitPath>E:/qtil/ADK_QCC512X_QCC302X_WIN_6.3.2.36</devkitPath>
+            <devkitGroup>kitres://{bbac163c-41be-4ce7-b236-236f15ff18ca}</devkitGroup>
+            <deployProject></deployProject>
+            <devkitRevision>1557218675</devkitRevision>
+            <property name="BUILD_ID">sdk://tools/ubuild/maker/buildid/examples/timestamp.py</property>
+            <property name="CHIP_TYPE">qcc512x_qcc302x</property>
+            <property name="DBG_CORE">app\p1</property>
+            <property name="DEFAULT_LIBS">usb_early_init</property>
+            <property name="DEFS">AURA</property>
+            <property name="EXTRA_WARNINGS">FALSE</property>
+            <property name="INCPATHS">sdk://apps/include/*.h;include/adk/*.h</property>
+            <property name="LIBPATHS">../../../../installed_libs/lib/default_qcc512x_qcc302x/native sdk://apps/installed_libs/lib/os/qcc512x_qcc302x</property>
+            <property name="PRESERVED_LIBS">qcc512x_qcc302x</property>
+            <property name="PRIVATE_DEFS">AURA</property>
+            <property name="PRIVATE_INCPATHS">include/*.h</property>
+            <property name="STRIP_SYMBOLS">FALSE</property>
+        </configuration>
+    </configurations>
+</project>

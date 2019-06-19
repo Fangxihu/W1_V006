@@ -106,7 +106,7 @@ extern const ledPattern app_led_pattern_power_on[];
 extern const ledPattern app_led_pattern_power_off[];
 extern const ledPattern app_led_pattern_error[];
 extern const ledPattern app_led_pattern_idle[];
-#ifdef RECONNECTING
+#ifdef RECONNECT_HANDSET
 extern const ledPattern app_led_pattern_reconnecting[];
 #endif
 extern const ledPattern app_led_pattern_idle_connected[];
@@ -394,7 +394,7 @@ extern const ringtone_note app_tone_av_link_loss[];
 #define appUiIdleConnectedActive() \
     appLedSetPattern(app_led_pattern_idle_connected, LED_PRI_LOW)
 
-#ifdef RECONNECTING
+#ifdef RECONNECT_HANDSET
 /*! \brief Show LED pattern for connected headset */
 #define appUiReconnectingHandset() \
     appLedSetPattern(app_led_pattern_reconnecting, LED_PRI_MED)

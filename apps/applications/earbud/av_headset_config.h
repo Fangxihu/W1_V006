@@ -10,7 +10,6 @@
 #ifndef _AV_HEADSET_CONFIG_H_
 #define _AV_HEADSET_CONFIG_H_
 
-#define RECONNECTING
 #define RECONNECT_HANDSET
 
 

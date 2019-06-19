@@ -1176,11 +1176,9 @@ static void appSmHandleConnRulesConnectHandset(CONN_RULES_CONNECT_HANDSET_T* crc
         /* Connect AVRCP and A2DP to handset */
         appAvConnectHandset();
     }
-#ifdef RECONNECTING
-	appUiReconnectingHandset();
-#endif
-
 #ifdef RECONNECT_HANDSET
+	appUiReconnectingHandset();
+
 	if(ruleConnectGetReason() == RULE_CONNECT_OUT_OF_CASE)
 	{
 		DEBUG_LOG("rule Connect Reason = out of case!");
@@ -1562,8 +1560,9 @@ static void appSmHandleAvA2dpConnectedInd(const AV_A2DP_CONNECTED_IND_T *ind)
 
         /* Record that we're connected with A2DP to handset */
         appDeviceSetA2dpWasConnected(&ind->bd_addr, TRUE);
-#ifdef RECONNECTING
+#ifdef RECONNECT_HANDSET
 		appUiReconnectingInactive();
+		appSmSetRuleConnectUser(FALSE);
 #endif
     }
 }
@@ -1713,8 +1712,9 @@ static void appSmHandleHfpConnectedInd(APP_HFP_CONNECTED_IND_T *ind)
 
         /* Record that we're connected with HFP to handset */
         appDeviceSetHfpWasConnected(&ind->bd_addr, TRUE);
-#ifdef RECONNECTING
+#ifdef RECONNECT_HANDSET
 		appUiReconnectingInactive();
+		appSmSetRuleConnectUser(FALSE);
 #endif
     }
 }
@@ -2408,13 +2408,11 @@ void appSmHandleReconnectHandset(void)
     /* Connect AVRCP and A2DP to handset */
     appAvConnectHandset();
 	
-#ifdef RECONNECTING
+#ifdef RECONNECT_HANDSET
 	appUiReconnectingHandset();
-#endif
 
 	DEBUG_LOG("ui!");
 
-#ifdef RECONNECT_HANDSET
 	if(appPeerSyncIsPeerHandsetReconnected())
 	{
 		DEBUG_LOG("peer has connected, start pairing!");

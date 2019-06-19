@@ -1,5 +1,7 @@
 */W1-V6.si4project/
 *.d
+*.log
+*.user
 *.a
 W1-V6.si4project/
 *.o

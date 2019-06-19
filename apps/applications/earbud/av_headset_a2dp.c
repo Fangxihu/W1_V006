@@ -1114,26 +1114,23 @@ static void appA2dpHandleInternalA2dpConnectRequest(avInstanceTaskData *theInst,
 					
                 }
             }
-
+			
+#ifdef RECONNECT_HANDSET
 			if(req->num_retries == 0)
 			{
-#ifdef RECONNECTING
 				appUiReconnectingInactive();
-#endif
 
-#ifdef RECONNECT_HANDSET
 				ReconnectSetState(RECONNECT_STATE_END);
-#endif
+
 				appConnRulesResetEvent(RULE_EVENT_USER_CONNECT);
 
 				appPeerSyncSend(FALSE);
 				
-#ifdef RECONNECT_HANDSET
 				if(appSmReconnectAndPairing())
 				{
 					appUiPairingActive();
 				}
-#endif
+				
 				//if(!appPeerSyncIsPeerHandsetReconnected() || (ruleConnectGetReason() == RULE_CONNECT_USER))
 				{
 					appScoFwdReconnectHandset();
@@ -1145,6 +1142,7 @@ static void appA2dpHandleInternalA2dpConnectRequest(avInstanceTaskData *theInst,
 					appScoFwdRuleConnectUser();
 				}
 			}
+#endif
         }
         return;
 

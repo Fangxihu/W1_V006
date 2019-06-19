@@ -995,6 +995,7 @@ static ruleAction ruleNoSyncConnectHandset(void)
     endif
     @enduml 
 */
+/*=============only for tws+======*/
 static ruleAction ruleConnectPeerHandset(ruleConnectReason reason)
 {
     connRulesTaskData *conn_rules = appGetConnRules();

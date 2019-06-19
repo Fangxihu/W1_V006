@@ -182,7 +182,7 @@ const ledPattern app_led_pattern_idle[] =
     LED_REPEAT(0, 0),
 };
 	
-#ifdef RECONNECTING
+#ifdef RECONNECT_HANDSET
 const ledPattern app_led_pattern_reconnecting[] = 
 {
     LED_LOCK,

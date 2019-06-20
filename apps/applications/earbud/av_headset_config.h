@@ -10,8 +10,11 @@
 #ifndef _AV_HEADSET_CONFIG_H_
 #define _AV_HEADSET_CONFIG_H_
 
+/*处理回连配对的逻辑*/
 #define RECONNECT_HANDSET
 
+/*处理弹窗的问题*/
+#define POP_UP
 
 /*连接的反馈处理，hfp和a2dp没连接上，出现CONNECT_FAILED都到这边-ConnectConfirm*/
 /*appHfpHandleHfpSlcConnectConfirm、appA2dpHandleA2dpSignallingConnectConfirm*/

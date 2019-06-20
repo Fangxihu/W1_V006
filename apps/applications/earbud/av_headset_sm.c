@@ -508,7 +508,9 @@ static void appEnterInCase(void)
 
 	ReconnectSetState(RECONNECT_STATE_NULL);
 #endif
-
+#if 0//def	POP_UP
+	appPairingClearPopupaddress();
+#endif
     /* Run rules for in case event */
     appConnRulesResetEvent(RULE_EVENT_OUT_CASE);
     appConnRulesSetEvent(appGetSmTask(), RULE_EVENT_IN_CASE);
@@ -1521,6 +1523,9 @@ static void appSmHandleConnRulesPageScanUpdate(const CONN_RULES_PAGE_SCAN_UPDATE
 }
 
 /*! \brief Handle command to pair with a handset. */
+
+/*pop_up 弹窗实现的关键是appPairingHandsetPairAddress()指定某一地址配对,
+正常弹窗逻辑这里是入口，该命令来自peer 的 commad命令*/
 static void appSmHandlePeerSigPairHandsetIndication(PEER_SIG_PAIR_HANDSET_IND_T *ind)
 {
     smTaskData *sm = appGetSm();
@@ -1539,7 +1544,24 @@ static void appSmHandlePeerSigPairHandsetIndication(PEER_SIG_PAIR_HANDSET_IND_T 
             appPairingHandsetPairAddress(&sm->task, &ind->handset_addr);
         }
         else
+    	{
+#ifdef POP_UP
+    	/*在断开连接的时候，手机端清楚记录，耳机端仍然保留，会导致耳机有连接属性。
+		出盒不进配对也是同样的道理*/
+			peerSigTaskData* peer_sig = appGetPeerSig();
+			
+			if(BdaddrIsZero(&peer_sig->popups_handset_addr))
+			{
+
+			}
+			else
+			{
+				appPairingHandsetPairAddress(&sm->task, &peer_sig->popups_handset_addr);
+			}
+				
+#endif
             DEBUG_LOG("appSmHandlePeerSigPairHandsetIndication, known handset, current connected so ignore pairing request");
+		}
     }
     else
     {

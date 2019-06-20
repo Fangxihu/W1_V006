@@ -153,10 +153,16 @@ static bool stateUpdateIsRequired(battery_level_state last_state,
             switch (new_state)
             {
                 case battery_level_too_low:
-                    return ltThreshold(voltage, appConfigBatteryVoltageCritical(), hysteresis);
+			{
+	                    return ltThreshold(voltage, appConfigBatteryVoltageCritical(), hysteresis);
+                	}
                 case battery_level_low:
-                    return gtThreshold(voltage, appConfigBatteryVoltageLow(), hysteresis);
+			{
+	                    return gtThreshold(voltage, appConfigBatteryVoltageLow(), hysteresis);
+			}
                 case battery_level_ok:
+			{
+			}
                     return TRUE;
                 default:
                     break;
@@ -168,8 +174,10 @@ static bool stateUpdateIsRequired(battery_level_state last_state,
             {
                 case battery_level_too_low:
                     return TRUE;
-                case battery_level_critical:
-                    return ltThreshold(voltage, appConfigBatteryVoltageLow(), hysteresis);
+                case battery_level_critical:/*low battery*/
+			{
+	                    return ltThreshold(voltage, appConfigBatteryVoltageLow(), hysteresis);
+                	}
                 case battery_level_ok:
                     return gtThreshold(voltage, appConfigBatteryVoltageOk(), hysteresis);
                 default:
@@ -181,7 +189,10 @@ static bool stateUpdateIsRequired(battery_level_state last_state,
             switch (new_state)
             {
                 case battery_level_too_low:
+                    return TRUE;
                 case battery_level_critical:
+			{
+                	}
                     return TRUE;
                 case battery_level_low:
                     return ltThreshold(voltage, appConfigBatteryVoltageOk(), hysteresis);

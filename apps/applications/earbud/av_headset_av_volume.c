@@ -42,16 +42,16 @@ static bool appAvApplyVolume(uint8 volume)
 
     if (appAvVolumeIsSet(volume))
     {
-        if (volume != theAv->volume)
+        if (volume != theAv->volume)/*vol更新才会被设置*/
         {
             /* Set local volume */
-            appAvSetLocalVolume(volume);
+            appAvSetLocalVolume(volume);/*最终是kymera那边设置gain值,打印来自这边*/
             theAv->volume = volume;
 
             /* Cancel any pending messages */
             MessageCancelFirst(&theAv->task, AV_INTERNAL_VOLUME_STORE_REQ);
 
-            /* Store configuration after 5 seconds */
+            /* Store configuration after 5 seconds */ /*音量是和地址绑定存储的*/
             MessageSendLater(&theAv->task, AV_INTERNAL_VOLUME_STORE_REQ, 0, D_SEC(5));
         }
         return TRUE;
@@ -68,6 +68,9 @@ static void appAvVolumeLoadDeviceVolumeAndSet(avInstanceTaskData *theInst)
         PanicFalse(appDeviceGetVolume(&theInst->bd_addr, &volume));
 
         DEBUG_LOGF("appAvVolumeLoadDeviceVolumeAndSet(%p), volume=%u", theInst, volume);
+		
+        DEBUG_LOGF("device, %x,%x,%lx",
+                   theInst->bd_addr.nap, theInst->bd_addr.uap, theInst->bd_addr.lap);
 
         /* Forward volume to other instance if AV connected */
         appAvVolumeSet(volume, theInst);
@@ -87,6 +90,8 @@ static void appAvVolumeLoadDeviceVolumeAndSet(avInstanceTaskData *theInst)
 */
 void appAvVolumeHandleA2dpConnect(avInstanceTaskData *theInst)
 {
+    DEBUG_LOG("appAvVolumeHandleA2dpConnect");
+
     if (appDeviceIsHandset(&theInst->bd_addr))
     {
         appAvVolumeLoadDeviceVolumeAndSet(theInst);
@@ -104,6 +109,8 @@ void appAvVolumeHandleA2dpConnect(avInstanceTaskData *theInst)
 */
 void appAvVolumeHandleAvrcpConnect(avInstanceTaskData *theInst)
 {
+    DEBUG_LOG("appAvVolumeHandleAvrcpConnect");
+
     if (appDeviceIsHandset(&theInst->bd_addr))
     {
         appAvVolumeLoadDeviceVolumeAndSet(theInst);
@@ -172,13 +179,16 @@ void appAvVolumeSet(uint8 volume, avInstanceTaskData *theOtherInst)
     /* Set local volume, never set a unset volume. */
     PanicFalse(appAvApplyVolume(volume));
 
-    /* Look in table to find connected instance */
+    /* Look in table to find connected instance */ /*AV_MAX_NUM_INSTANCES=2*/
     for (int instance = 0; instance < AV_MAX_NUM_INSTANCES; instance++)
     {
         avInstanceTaskData *theInst = appGetAv()->av_inst[instance];
         bdaddr *bd_addr = &theInst->bd_addr;
+		DEBUG_LOGF("debug timers %d", instance);
+		
         if (theInst && (theInst != theOtherInst))
         {
+			DEBUG_LOG(" timers ");
             if (appAvIsAvrcpConnected(theInst))
             {
                 if (appDeviceIsHandset(bd_addr))
@@ -275,6 +285,7 @@ bool appAvVolumeChange(int16 step)
 */
 bool appAvVolumeRepeat(int16 step)
 {
+    DEBUG_LOG("appAvVolumeRepeat~");
     /* Handle volume change locally */
     if (appAvVolumeChange(step))
     {

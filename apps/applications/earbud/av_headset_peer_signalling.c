@@ -693,6 +693,7 @@ static bool appPeerSigHandleRxLinkKey(AV_AVRCP_VENDOR_PASSTHROUGH_IND_T *ind)
 }
 
 /*! \brief Receive pair handset command. */
+/*POP_UP*/
 static bool appPeerSigHandlePairHandsetCommand(AV_AVRCP_VENDOR_PASSTHROUGH_IND_T *ind)
 {
     peerSigTaskData* peer_sig = appGetPeerSig();
@@ -716,6 +717,11 @@ static bool appPeerSigHandlePairHandsetCommand(AV_AVRCP_VENDOR_PASSTHROUGH_IND_T
         message->handset_addr.uap = ind->payload[index+3];
         message->handset_addr.nap = (uint16)(((uint16)ind->payload[index+4]) |
                                              ((uint16)ind->payload[index+5]) << 8);
+#ifdef	POP_UP
+		DEBUG_LOG("POP_UP-peer com recived <==");
+		peer_sig->popups_handset_addr = message->handset_addr;
+		//appUiPairingFailed();
+#endif
         MessageSend(peer_sig->rx_pair_handset_task, PEER_SIG_PAIR_HANDSET_IND, message);
         DEBUG_LOGF("appPeerSigHandlePairHandsetCommand %lx %x %x", message->handset_addr.lap, message->handset_addr.uap, message->handset_addr.nap);
         return TRUE;

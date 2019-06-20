@@ -1126,7 +1126,7 @@ static void appAvrcpHandleAvrcpDisconnectIndication(avInstanceTaskData *theInst,
 static void appAvrcpHandleAvrcpPassthroughIndication(avInstanceTaskData *theInst, const AVRCP_PASSTHROUGH_IND_T *ind)
 {
     assert(theInst->avrcp.avrcp == ind->avrcp);
-    DEBUG_LOGF("appAvrcpHandleAvrcpPassthroughIndication(%p) %d", (void *)theInst, ind->state);
+    DEBUG_LOGF("appAvrcpHandleAvrcpPassthroughIndication(%p) %d,opid=0x%x", (void *)theInst, ind->state, ind->opid);
     
     switch (appAvrcpGetState(theInst))
     {
@@ -1520,6 +1520,7 @@ static void appAvrcpHandleRegisterNotificationInd(avInstanceTaskData *theInst, A
 
 /*! \brief Absolute volume change from A2DP Source (Handset or TWS Master)
 */
+/*从手机端音量改变的时候回通知到这边，唯一入口*/
 static void appAvrcpHandleSetAbsoluteVolumeInd(avInstanceTaskData *theInst, AVRCP_SET_ABSOLUTE_VOLUME_IND_T *ind)
 {
     assert(theInst->avrcp.avrcp == ind->avrcp);
@@ -1527,7 +1528,7 @@ static void appAvrcpHandleSetAbsoluteVolumeInd(avInstanceTaskData *theInst, AVRC
 
     theInst->avrcp.volume = ind->volume;
 
-    /* Send set volume ind to all clients */
+    /* Send set volume ind to all clients */	/*但实际上都被ignore，仅有av在处理*/
     MAKE_AV_MESSAGE(AV_AVRCP_SET_VOLUME_IND)
     message->av_instance = theInst;
     message->bd_addr = theInst->bd_addr;

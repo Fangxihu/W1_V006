@@ -851,7 +851,7 @@ static void appAvEnterInitialisingA2dp(avTaskData *theAv)
           .in_use = FeatureVerifyLicense(APTX_CLASSIC_MONO) ? 0 : A2DP_SEP_UNAVAILABLE,
         },
         { .sep_config = &av_aac_snk_sep,
-          .in_use = 0,
+          .in_use = appConfigAACEnbable() ? 0 : A2DP_SEP_UNAVAILABLE,
         },
         { .sep_config = &av_sbc_snk_sep,
           .in_use = 0,

@@ -334,6 +334,26 @@ static void appPeerSyncUpdatePeerInEar(bool peer_in_ear)
     }
 }
 
+#ifdef	POP_UP
+static void appPeerSyncUpdatePeerIsPairing(bool peer_is_pairing)
+{
+	peerSyncTaskData* ps = appGetPeerSync();
+	bool current_peer_is_pairing_state = ps->peer_in_ear;
+
+	ps->peer_in_ear = peer_is_pairing;
+
+	if (!current_peer_is_pairing_state && peer_is_pairing)
+	{
+		DEBUG_LOGF("Peer enter Pairing Prev %u New %u", current_peer_is_pairing_state, peer_is_pairing);
+		appPairingClearPopupaddress();
+	}
+	else if (current_peer_is_pairing_state && !peer_is_pairing)
+	{
+		DEBUG_LOGF("Peer end Pairing Prev %u New %u", current_peer_is_pairing_state, peer_is_pairing);
+	}
+}
+#endif
+
 /*! \brief Dump the contents of a peer sync message to the console.
     \param msg [in] Pointer to a peer sync message.
 */
@@ -554,7 +574,9 @@ static void appPeerSyncHandlePeerSigMsgChannelTxInd(const PEER_SIG_MSG_CHANNEL_R
     ps->peer_handset_addr.nap    = PEER_SYNC_GET_HANDSET_NAP(ind->msg);
     ps->peer_handset_tws         = PEER_SYNC_GET_TWS_VERSION(ind->msg);
     ps->peer_a2dp_streaming      = PEER_SYNC_STATE_IS_A2DP_STREAMING(ind->msg);
+#ifndef	POP_UP
     ps->peer_is_pairing          = PEER_SYNC_PAIRING_IS_HANDSET_PAIRING(ind->msg);
+#endif
     ps->peer_has_handset_pairing = PEER_SYNC_PAIRING_HAS_HANDSET_PAIRING(ind->msg);
     ps->peer_rules_in_progress   = PEER_SYNC_STATE_IS_RULES_IN_PROGRESS(ind->msg);
     ps->peer_sco_active          = PEER_SYNC_STATE_IS_SCO_ACTIVE(ind->msg);
@@ -563,6 +585,11 @@ static void appPeerSyncHandlePeerSigMsgChannelTxInd(const PEER_SIG_MSG_CHANNEL_R
 	ps->peer_handset_reconnected = PEER_SYNC_STATE_IS_HANDSET_RECONNECTED(ind->msg);
 	ps->peer_handset_reconnecting = PEER_SYNC_STATE_IS_HANDSET_RECONNECTING(ind->msg);
 	DEBUG_LOGF("reconnected = %d, reconnecting = %d", ps->peer_handset_reconnected, ps->peer_handset_reconnecting);
+#endif
+
+#ifdef	POP_UP
+	appPeerSyncUpdatePeerIsPairing(PEER_SYNC_PAIRING_IS_HANDSET_PAIRING(ind->msg));
+
 #endif
 
     /* remember and possibly generate local events for some peer state changes */
@@ -857,4 +884,15 @@ bool appPeerSyncIsPeerHandsetReconnecting(void)
 
 #endif
 
+bool appPeerSyncIsPeerHandsetConnected(void)
+{
+    peerSyncTaskData* ps = appGetPeerSync();
+    return (ps->peer_a2dp_connected || ps->peer_hfp_connected || ps->peer_avrcp_connected);
+}
+
+bool appPeerSyncUserPeerIsPairing(void)
+{
+    peerSyncTaskData* ps = appGetPeerSync();
+    return ps->peer_is_pairing;
+}
 

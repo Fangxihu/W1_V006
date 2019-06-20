@@ -607,6 +607,7 @@ static void appPairingPeerUpdate(pairingTaskData *thePairing)
 
 static void appPairingHandsetComplete(pairingTaskData *thePairing, pairingStatus status, const bdaddr *bd_addr)
 {
+	peerSigTaskData* peer_sig = appGetPeerSig();
     DEBUG_LOG("appPairingHandsetComplete!");
 
     if (thePairing->client_task)
@@ -629,17 +630,56 @@ static void appPairingHandsetComplete(pairingTaskData *thePairing, pairingStatus
     }
 #endif
 
-    MessageCancelFirst(&thePairing->task, PAIRING_INTERNAL_HANDSET_PAIR_REQ);
+    MessageCancelAll(&thePairing->task, PAIRING_INTERNAL_HANDSET_PAIR_REQ);
+
+    DEBUG_LOGF("pairing Status, status = %d", status);
 
     if (pairingHandsetSuccess == status)
     {
+#ifdef	POP_UP
+    	appPairingClearPopupaddress();
+#endif
         appUiPairingComplete();
     }
-    /*else
+    else
     {
         if (status != pairingHandsetCancelled)
-            appUiPairingFailed();
-    }*/
+    	{
+#ifdef	POP_UP
+			if (status > pairingHandsetSuccess)
+			{
+				bdaddr temp_bd_addr;
+				
+				/*if(appPeerSyncUserPeerIsPairing)
+				{
+					BdaddrSetZero(&peer_sig->popups_handset_addr);
+				}*/
+					
+				temp_bd_addr = peer_sig->popups_handset_addr;
+				
+				//if(BdaddrIsZero(&temp_bd_addr))
+				{
+					//appPeerSyncGetPeerHandsetAddr(&temp_bd_addr);
+				}
+				
+				//else if(appPeerSyncIsPeerHandsetConnected())
+				{
+					if(BdaddrIsZero(&temp_bd_addr))
+					{
+						//BdaddrIsZero(&temp_bd_addr);
+						DEBUG_LOG("Bdaddr Is Zero!");
+					}
+					else
+					{
+						appPairingHandsetPairAddress(appGetSmTask(), &temp_bd_addr);
+					}
+				}
+				DEBUG_LOG("Re-pair!");
+			}
+#endif
+		}
+            //appUiPairingFailed();
+    }
 
     /* Move back to 'idle' state */
     appPairingSetState(thePairing, PAIRING_STATE_IDLE);
@@ -1528,6 +1568,9 @@ static void appHandleInternalHandsetPairRequest(pairingTaskData *thePairing, PAI
             {
                 /* Move to 'discoverable' state to start inquiry & page scan */
                 appPairingSetState(thePairing, PAIRING_STATE_HANDSET_DISCOVERABLE);
+#ifdef	POP_UP
+				appPairingClearPopupaddress();
+#endif
             }
             else
             {
@@ -2011,6 +2054,7 @@ void appPairingHandsetPair(Task client_task, bool is_user_initiated)
 
 /*! \brief Pair with a handset where the address is already known.
  */
+ /*这里如果没有地址传进来，或者地址为null，就等同于上面的函数*/
 void appPairingHandsetPairAddress(Task client_task, bdaddr* handset_addr)
 {
     MAKE_PAIRING_MESSAGE(PAIR_REQ);
@@ -2077,4 +2121,14 @@ void appPairingClearHandsetLinkTxReqd(void)
     appDeviceGetHandsetAttributes(&handset_addr, &attr, NULL);
     appDeviceSetHandsetLinkKeyTxReqd(&handset_addr, FALSE);
 }
+
+#ifdef POP_UP
+
+void appPairingClearPopupaddress(void)
+{
+	peerSigTaskData* peer_sig = appGetPeerSig();
+	BdaddrSetZero(&peer_sig->popups_handset_addr);
+    DEBUG_LOG("Clear Popup address");
+}
+#endif
 

@@ -158,20 +158,20 @@ typedef struct
 typedef enum pairing_status
 {
     pairingSuccess,
-    pairingNotReady,
+    pairingNotReady,/*1*/
     pairingNoPeerFound,
     pairingNoPeerServiceRecord,
-    pairingPeerAuthenticationFailed,
+    pairingPeerAuthenticationFailed,/*4*/
     pairingPeerVersionMismatch,
     pairingPeerTimeout,
-    pairingPeerCancelled,
+    pairingPeerCancelled,/*7*/
 
     pairingHandsetSuccess,
-    pairingHandsetAuthenticationFailed,
+    pairingHandsetAuthenticationFailed,/*9*/
     pairingHandsetNoLinkKey,
     pairingHandsetTimeout,
     pairingHandsetUnknown,
-    pairingHandsetCancelled
+    pairingHandsetCancelled/*13*/
 } pairingStatus;
 
 /*! \brief Message IDs from Pairing task to main application task */
@@ -206,6 +206,13 @@ typedef struct
     /*! The address of the paired handset */
     bdaddr handset_bd_addr;
 } PAIRING_HANDSET_PAIR_CFM_T;
+
+
+#ifdef POP_UP
+
+extern void appPairingClearPopupaddress(void);
+
+#endif
 
 /*! \brief Initialise the pairing application module.
  */

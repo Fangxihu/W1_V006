@@ -72,6 +72,9 @@ typedef struct
     Task client_task;               /*!< Task to respond with result of current peer signalling operation */
     uint16 current_op;              /*!< Type of in progress operation. */
     bdaddr handset_addr;            /*!< Address of the handset for current operation */
+#ifdef	POP_UP
+	bdaddr popups_handset_addr;			/*!< Address of the handset for current operation */
+#endif
 
     /* State related to msg channel facility. */
     TaskList* msg_channel_tasks;         /*!< List of tasks and associated signalling channel. */

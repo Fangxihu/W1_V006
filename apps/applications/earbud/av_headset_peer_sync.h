@@ -102,6 +102,10 @@ typedef struct
 extern bool appPeerSyncIsPeerHandsetReconnected(void);
 extern bool appPeerSyncIsPeerHandsetReconnecting(void);
 #endif
+
+extern bool appPeerSyncIsPeerHandsetConnected(void);
+extern bool appPeerSyncUserPeerIsPairing(void);
+
 /*! \brief Send a peer sync to peer earbud.
     \param response [IN] TRUE if this is a response peer sync.
  */

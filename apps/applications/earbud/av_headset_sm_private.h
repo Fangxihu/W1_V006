@@ -35,6 +35,9 @@ enum sm_internal_message_ids
     SM_INTERNAL_TIMEOUT_OUT_OF_EAR_SCO,            /*!< Timeout to transfer SCO to AG when earbud removed from ear while call active. */
     SM_INTERNAL_TIMEOUT_IN_EAR_A2DP_START,         /*!< Timeout within which restart audio if earbud put back in ear. */
     SM_INTERNAL_TIMEOUT_IDLE,                      /*!< Timeout when idle. */
+#ifdef	AUTO_POWER_OFF
+	SM_INTERNAL_TIMEOUT_POWER_OFF,				   /*!< Timeout when idle. */
+#endif
 };
 
 #endif /* _AV_HEADSET_SM_PRIVATE_H_ */

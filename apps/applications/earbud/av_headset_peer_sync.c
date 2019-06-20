@@ -338,9 +338,9 @@ static void appPeerSyncUpdatePeerInEar(bool peer_in_ear)
 static void appPeerSyncUpdatePeerIsPairing(bool peer_is_pairing)
 {
 	peerSyncTaskData* ps = appGetPeerSync();
-	bool current_peer_is_pairing_state = ps->peer_in_ear;
+	bool current_peer_is_pairing_state = ps->peer_is_pairing;
 
-	ps->peer_in_ear = peer_is_pairing;
+	ps->peer_is_pairing = peer_is_pairing;
 
 	if (!current_peer_is_pairing_state && peer_is_pairing)
 	{

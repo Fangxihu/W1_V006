@@ -19,7 +19,17 @@
 /*连接的反馈处理，hfp和a2dp没连接上，出现CONNECT_FAILED都到这边-ConnectConfirm*/
 /*appHfpHandleHfpSlcConnectConfirm、appA2dpHandleA2dpSignallingConnectConfirm*/
 
+/*关闭手机到耳机、耳机到耳机的aac解码*/
+#define DISABLE_AAC
 
+/*自动关机处理*/
+#define	AUTO_POWER_OFF
+
+/*电量显示百分比调整，和低版本HFP没电量显示问题*/
+#define BATTERY_COMPENSATION
+
+
+/*==============================END==============================*/
 
 
 /*! Allow 2nd Earbud to connect to TWS+ Handset after pairing */
@@ -410,7 +420,13 @@
 /*! This config relates to the behavior of the TWS standard master when AAC sink.
     If TRUE, it will forward the received stereo AAC data to the slave earbud.
     If FALSE, it will transcode one channel to SBC mono and forward. */
+#ifdef DISABLE_AAC
+#define appConfigAACStereoForwarding() FALSE
+#define appConfigAACEnbable() FALSE
+#else
 #define appConfigAACStereoForwarding() TRUE
+#define appConfigAACEnbable() TRUE
+#endif
 
 /*! When a voice prompt is played, for this period of time, any repeated prompt
     will not be played. Set to zero to play all prompts, regardless of whether

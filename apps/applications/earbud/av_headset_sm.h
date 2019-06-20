@@ -199,6 +199,9 @@ typedef struct
 	reconnectState rec_state; 					/*!< Application state */
 	
 #endif
+#ifdef	AUTO_POWER_OFF
+	uint8 auto_power_off_times;
+#endif
 } smTaskData;
 
 /*! \brief Bitmask use to signal connect links in lock */

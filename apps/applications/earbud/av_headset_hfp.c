@@ -57,6 +57,18 @@ static void appHfpHandleInternalConfigWriteRequest(void);
 static void appHfpConfigStore(void);
 static void appHfpHandleMessage(Task task, MessageId id, Message message);
 
+#ifdef BATTERY_COMPENSATION
+
+static void HfpAccevIndStatusRequest(void)
+{  
+    char at_cmd[25];  
+
+    snprintf(at_cmd, sizeof(at_cmd), "AT+IPHONEACCEV=1,1,%d\r",appBatteryGetPercentHFP()/10);  
+
+    HfpAtCmdRequest(1, at_cmd);  
+}  
+#endif
+
 /*! \brief Set default attributes
 
     This function populates the supplied attributes with 
@@ -1482,7 +1494,13 @@ static void appHfpHandleHfpHfIndicatorsInd(const HFP_HF_INDICATORS_IND_T *ind)
             hfp->battery_form.representation = battery_level_repres_percent;
 
             appBatteryRegister(&hfp->battery_form);
-            HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, appBatteryGetPercent());
+			
+#ifdef BATTERY_COMPENSATION
+			HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, appBatteryGetPercentHFP());
+			HfpAccevIndStatusRequest();
+#else
+			HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, appBatteryGetPercent());
+#endif
         }
         else
         {
@@ -1494,13 +1512,20 @@ static void appHfpHandleHfpHfIndicatorsInd(const HFP_HF_INDICATORS_IND_T *ind)
 
 static void appHfpHandleBatteryLevelUpdatePercent(MESSAGE_BATTERY_LEVEL_UPDATE_PERCENT_T *msg)
 {
+    DEBUG_LOGF("appHfpHandleHfpHfIndicatorsInd, percent %d", msg->percent);
+
     switch (appHfpGetState())
     {
         case HFP_STATE_CONNECTED_IDLE:
         case HFP_STATE_CONNECTED_OUTGOING:
         case HFP_STATE_CONNECTED_INCOMING:
         case HFP_STATE_CONNECTED_ACTIVE:
-            HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, msg->percent);
+#ifdef BATTERY_COMPENSATION
+			HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, appBatteryGetPercentHFP());
+			HfpAccevIndStatusRequest();
+#else
+			HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, msg->percent);
+#endif
             break;
 
         default:

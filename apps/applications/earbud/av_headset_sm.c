@@ -26,12 +26,51 @@
 #include <ps.h>
 #include <boot.h>
 
+
+#ifdef	AUTO_POWER_OFF
+//#define appConfigPowerOffTimeoutMs()   D_SEC(300)
+
+#define appConfigPowerOffCheckInterval()   D_SEC(5)
+#define AUTOPOWEROFFCOUNT	120
+#endif
+
 static void appSmHandleInternalDeleteHandsets(void);
 static void appSmHandleInternalPairHandset(void);
 
 /*****************************************************************************
  * SM utility functions
  *****************************************************************************/
+ 
+#ifdef	AUTO_POWER_OFF
+static void appSmAtuoPowerOff(void)
+{
+    smTaskData* sm = appGetSm();
+
+	MessageCancelAll(appGetSmTask(), SM_INTERNAL_TIMEOUT_POWER_OFF);
+	MessageSendLater(appGetSmTask(), SM_INTERNAL_TIMEOUT_POWER_OFF, NULL, appConfigPowerOffCheckInterval());
+	
+	if(appSmIsOutOfCase())	{
+		if(appDeviceIsHandsetHfpConnected() || appDeviceIsHandsetAvrcpConnected() || appDeviceIsHandsetA2dpConnected() ||\
+			appPeerSyncIsPeerHandsetHfpConnected() || appPeerSyncIsPeerHandsetA2dpConnected() ||\
+			(appGetState() == APP_STATE_HANDSET_PAIRING) || (appPeerSyncIsPeerPairing()))	{
+			
+			sm->auto_power_off_times = 0;
+		}
+		else	{
+			sm->auto_power_off_times++;
+			if(sm->auto_power_off_times > AUTOPOWEROFFCOUNT)	{
+				appPowerOffRequest();
+			}
+		}
+	}
+	else	{
+		sm->auto_power_off_times = 0;
+	}
+}
+
+
+#endif
+
 static void appSmCancelDfuTimers(void)
 {
     MessageCancelAll(appGetSmTask(),SM_INTERNAL_TIMEOUT_DFU_ENTRY);
@@ -1996,6 +2035,9 @@ void appSmHandleMessage(Task task, MessageId id, Message message)
     {
         case INIT_CFM:
             appSmHandleInitConfirm();
+#ifdef	AUTO_POWER_OFF
+			MessageSendLater(appGetSmTask(), SM_INTERNAL_TIMEOUT_POWER_OFF, NULL, appConfigPowerOffCheckInterval());
+#endif
             break;
 
         /* Pairing completion confirmations */
@@ -2223,6 +2265,12 @@ void appSmHandleMessage(Task task, MessageId id, Message message)
         case SM_INTERNAL_LINK_DISCONNECTION_COMPLETE:
             appSmHandleInternalAllLinksDisconnected();
             break;
+		
+#ifdef	AUTO_POWER_OFF
+		case SM_INTERNAL_TIMEOUT_POWER_OFF:
+			appSmAtuoPowerOff();
+			break;
+#endif
 
         default:
             appHandleUnexpected(id);

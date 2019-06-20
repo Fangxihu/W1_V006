@@ -16,6 +16,12 @@
 #include "hydra_macros.h"
 #include "panic.h"
 
+#ifdef BATTERY_COMPENSATION
+/*VALUE为调整的阈值，单位mv，意味着 截止电压-3650 占比 90% */
+#define BATTERY_COMPENSATION_VALUE	3650
+#define HIGH_PROPORTION	90
+#endif
+
 /*! Whilst the filter is being filled read at this rate */
 #define BATTERY_READ_PERIOD_INITIAL (0)
 
@@ -74,6 +80,39 @@ static uint8 toPercentage(uint16 voltage)
 
     return (100UL * (uint32)(voltage - critical)) / (uint32)(charged - critical);
 }
+
+/*Battery compensation*/
+#ifdef BATTERY_COMPENSATION
+static uint8 toPercentageHL(uint16 voltage)
+{
+    uint16 critical = BATTERY_COMPENSATION_VALUE;
+    uint16 charged = appConfigBatteryFullyCharged();
+    uint16 mix = appConfigBatteryVoltageCritical();
+
+	if(voltage > critical)	{
+		if (voltage > charged)
+	        voltage = charged;
+
+	    return ((90UL * (uint32)(voltage - critical)) / (uint32)(charged - critical) + 10UL);
+	}
+	else	{
+	    if (voltage < mix)
+	        voltage = mix;
+	    else if (voltage >= critical)
+	        voltage = critical;
+
+	    return (10UL * (uint32)(voltage - mix)) / (uint32)(critical - mix);
+	}
+}
+
+uint8 appBatteryGetPercentHFP(void)
+{
+    uint16 voltage = appBatteryGetVoltage();
+
+    return toPercentageHL(voltage);
+}
+
+#endif
 
 static battery_level_state toState(uint16 voltage)
 {

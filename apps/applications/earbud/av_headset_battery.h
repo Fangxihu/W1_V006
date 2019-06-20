@@ -176,4 +176,8 @@ extern uint8 appBatteryGetPercent(void);
     @return The battery state. */
 extern battery_level_state appBatteryGetState(void);
 
+#ifdef BATTERY_COMPENSATION
+extern uint8 appBatteryGetPercentHFP(void);
+#endif
+
 #endif

@@ -1126,6 +1126,13 @@ static void appA2dpHandleInternalA2dpConnectRequest(avInstanceTaskData *theInst,
 
 				appPeerSyncSend(FALSE);
 				
+				/*link loss自己链接完就打住*/
+				if(ruleConnectGetReason() == RULE_CONNECT_LINK_LOSS)
+				{
+					DEBUG_LOG("rule Connect Reason = rule connect user!");
+					return;
+				}
+				
 				if(appSmReconnectAndPairing())
 				{
 					appUiPairingActive();

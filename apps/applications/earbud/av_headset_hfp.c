@@ -842,6 +842,27 @@ static void appHfpHandleHfpSlcDisconnectIndication(const HFP_SLC_DISCONNECT_IND_
 
                 /* Set disconnect reason */
                 appGetHfp()->disconnect_reason = APP_HFP_DISCONNECT_NORMAL;
+				
+#ifdef AUTO_PAIRIING
+				if(PHY_STATE_IN_CASE != appPhyStateGetState())
+				{
+					bdaddr	bd_addr = appGetHfp()->ag_bd_addr;
+					if (appDeviceIsTwsPlusHandset(&bd_addr))
+					{/*如果是tws+的手机的话就固定左耳进pairing*/
+						if (appConfigIsLeft())
+						{
+							DEBUG_LOG("TWS+ handset");
+							appSmPairHandset();
+						}
+					}
+					else
+					{
+						DEBUG_LOG("TWS handset");
+						appSmPairHandset();
+					}
+				}
+#endif
+
             }
 
             /* Move to disconnected state */

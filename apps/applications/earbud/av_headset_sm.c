@@ -37,7 +37,7 @@
 static void appSmHandleInternalDeleteHandsets(void);
 static void appSmHandleInternalPairHandset(void);
 
-#ifdef AUTO_PAIRIING
+#if 0//def AUTO_PAIRIING
 static void appSmHandleAutoPairing(const bdaddr *bd_addr);
 #endif
 
@@ -1235,6 +1235,7 @@ static void appSmHandleConnRulesConnectHandset(CONN_RULES_CONNECT_HANDSET_T* crc
         /* Connect AVRCP and A2DP to handset */
         appAvConnectHandset();
     }
+	
 #ifdef RECONNECT_HANDSET
 	appUiReconnectingHandset();
 
@@ -1255,6 +1256,7 @@ static void appSmHandleConnRulesConnectHandset(CONN_RULES_CONNECT_HANDSET_T* crc
 
 	if(ruleConnectGetReason() == RULE_CONNECT_USER)
 	{
+		DEBUG_LOG("rule Connect Reason = rule connect user!");
 		appSmSetRuleConnectUser(TRUE);
 	}
 	
@@ -1828,8 +1830,8 @@ static void appSmHandleHfpDisconnectedInd(APP_HFP_DISCONNECTED_IND_T *ind)
                 if (ind->reason == APP_HFP_DISCONNECT_NORMAL && !appSmIsDisconnectingLinks())
                     appDeviceSetHfpWasConnected(&ind->bd_addr, FALSE);
 
-#ifdef AUTO_PAIRIING
-					appSmHandleAutoPairing(&ind->bd_addr);
+#if 0//def AUTO_PAIRIING
+				appSmHandleAutoPairing(&ind->bd_addr);
 #endif
             }
         }
@@ -2488,6 +2490,8 @@ void appSmClearReconnectAndPairing(void)
 void appSmHandleReconnectHandset(void)
 {
     DEBUG_LOG("appSmHandleReconnectHandset-reconnect!");
+
+	if(ReconnectGetState() == RECONNECT_STATE_ING) return;
 	
 	ReconnectSetState(RECONNECT_STATE_ING);
 	
@@ -2574,7 +2578,7 @@ reconnectState ReconnectGetState(void)
 
 #endif
 
-#ifdef AUTO_PAIRIING
+#if 0//def AUTO_PAIRIING
 static void appSmHandleAutoPairing(const bdaddr *bd_addr)
 {
     appHfpDisconnectReason reason = appHfpGetDisconnectReason();
@@ -2604,6 +2608,7 @@ static void appSmHandleAutoPairing(const bdaddr *bd_addr)
 				else
 				{
 					DEBUG_LOG("TWS handset");
+					appSmPairHandset();
 				}
 			}
             break;

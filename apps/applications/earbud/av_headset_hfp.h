@@ -87,6 +87,15 @@ typedef enum
 
 struct appTaskData;
 
+/*! \brief HFP disconnect reasons */
+typedef enum
+{
+    APP_HFP_CONNECT_FAILED,			/*!< Connect attempt failed */
+    APP_HFP_DISCONNECT_LINKLOSS,	/*!< Disconnect due to link loss following supervision timeout */
+    APP_HFP_DISCONNECT_NORMAL,		/*!< Disconnect initiated by local or remote device */
+    APP_HFP_DISCONNECT_ERROR		/*!< Disconnect due to unknown reason */
+} appHfpDisconnectReason;
+
 /*! \brief HFP instance structure
 
     This structure contains all the information for an HFP connection.
@@ -133,6 +142,10 @@ typedef struct
     bool        sco_forward_handling_volume;        /*!< SCOFWD is handling setting volume in kymera. */
 
     batteryRegistrationForm battery_form;
+
+#ifdef AUTO_PAIRIING
+	appHfpDisconnectReason	reason;
+#endif
 } hfpTaskData;
 
 /*! \brief HFP settings structure
@@ -189,14 +202,6 @@ typedef struct
     bdaddr bd_addr;			/*!< Address of AG */
 } APP_HFP_CONNECTED_IND_T;
 
-/*! \brief HFP disconnect reasons */
-typedef enum
-{
-    APP_HFP_CONNECT_FAILED,			/*!< Connect attempt failed */
-    APP_HFP_DISCONNECT_LINKLOSS,	/*!< Disconnect due to link loss following supervision timeout */
-    APP_HFP_DISCONNECT_NORMAL,		/*!< Disconnect initiated by local or remote device */
-    APP_HFP_DISCONNECT_ERROR		/*!< Disconnect due to unknown reason */
-} appHfpDisconnectReason;
 
 /*! Message sent to status_notify_list clients indicating HFP profile has disconnected. */
 typedef struct
@@ -344,6 +349,10 @@ extern void appHfpRegisterAtCmdTask(Task task);
 extern void appHfpStatusClientRegister(Task task);
 extern uint8 appHfpGetVolume(void);
 extern void appHfpScoFwdHandlingVolume(bool enabled);
+
+#ifdef AUTO_PAIRIING
+extern appHfpDisconnectReason appHfpGetDisconnectReason(void);
+#endif
 
 #else
 

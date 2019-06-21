@@ -52,6 +52,10 @@ const hfpState hfp_call_state_table[10] =
     /* hfp_call_state_multiparty        */ HFP_STATE_CONNECTED_IDLE, /* Not supported */
 };
 
+#ifdef AUTO_PAIRIING
+static void appHfpSetDisconnectReason(appHfpDisconnectReason reason);
+#endif
+
 /* Local Function Prototypes */
 static void appHfpHandleInternalConfigWriteRequest(void);
 static void appHfpConfigStore(void);
@@ -479,13 +483,17 @@ static void appHfpExitDisconnecting(void)
 static void appHfpEnterDisconnected(void)
 {
     DEBUG_LOG("appHfpEnterDisconnected");
+	
+#ifdef AUTO_PAIRIING
+	appHfpSetDisconnectReason(appGetHfp()->disconnect_reason);
+#endif
 
     /* Tell clients we have disconnected */
     MAKE_HFP_MESSAGE(APP_HFP_DISCONNECTED_IND);
     message->bd_addr = appGetHfp()->ag_bd_addr;
     message->reason =  appGetHfp()->disconnect_reason;
     appTaskListMessageSend(appGetHfp()->status_notify_list, APP_HFP_DISCONNECTED_IND, message);
-
+	
 #ifdef INCLUDE_AV
     /* Resume AV streaming if HFP disconnects for any reason */
     appAvStreamingResume(AV_SUSPEND_REASON_HFP);
@@ -800,6 +808,7 @@ static void appHfpHandleHfpSlcConnectConfirm(const HFP_SLC_CONNECT_CFM_T *cfm)
 static void appHfpHandleHfpSlcDisconnectIndication(const HFP_SLC_DISCONNECT_IND_T *ind)
 {
     DEBUG_LOGF("appHfpHandleHfpSlcDisconnectIndication(%d)", ind->status);
+    DEBUG_LOGF("appHfpGetState(%d)", appHfpGetState());
 
     switch (appHfpGetState())
     {
@@ -2986,4 +2995,55 @@ static void appHfpHandleMessage(Task task, MessageId id, Message message)
    /* Unhandled message */
    appHfpError(id, message);
 }
+
+#ifdef AUTO_PAIRIING
+static void appHfpSetDisconnectReason(appHfpDisconnectReason reason)
+{
+    appHfpDisconnectReason previous_reason = appGetHfp()->reason;
+    
+    DEBUG_LOGF("appHfpSetDisconnectReason(%d)", reason);
+
+    /* Handle state exit functions */
+    switch (previous_reason)
+    {
+        case APP_HFP_CONNECT_FAILED:
+            break;
+        case APP_HFP_DISCONNECT_LINKLOSS:
+            break;
+        case APP_HFP_DISCONNECT_NORMAL:
+            break;            
+        case APP_HFP_DISCONNECT_ERROR:
+            break;
+        default:
+            break;
+    }               
+    
+    /* Set new state, copy old state */
+    appGetHfp()->reason = reason;
+    
+    /* Handle state entry functions */
+    switch (reason)
+    {
+        case APP_HFP_CONNECT_FAILED:
+            break;
+        case APP_HFP_DISCONNECT_LINKLOSS:
+            break;
+        case APP_HFP_DISCONNECT_NORMAL:
+            break;            
+        case APP_HFP_DISCONNECT_ERROR:
+            break;
+        default:
+            break;
+    }               
+}
+
+appHfpDisconnectReason appHfpGetDisconnectReason(void)
+{
+    //return appGetHfp()->reason;
+    return appGetHfp()->disconnect_reason;
+}
+
+
+#endif
+
 #endif

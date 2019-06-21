@@ -475,9 +475,13 @@ static void appLinkPolicyUpdateRole(const bdaddr *bd_addr, hci_role role)
             BdaddrIsSame(bd_addr, &av_bd_addr.taddr.addr))
         {
             if (role == hci_role_master)
+        	{
                 DEBUG_LOG("appLinkPolicyUpdateRole, av sink, role=master");
+        	}
             else
+        	{
                 DEBUG_LOG("appLinkPolicyUpdateRole, av sink, role=slave");
+        	}
 
             theLp->av_sink_role = role;
         }

@@ -2962,6 +2962,14 @@ void appA2dpInstanceHandleMessage(avInstanceTaskData *theInst, MessageId id, Mes
     appA2dpError(theInst, id, message);
 }
 
+#if 0//def AUTO_PAIRIING
+avA2dpDisconnectReason appA2dpGetDisconnectReason(void)
+{
+    //return appGetHfp()->reason;
+    return appGetHfp()->disconnect_reason;
+}
+#endif
+
 #else
 static const int compiler_happy;
 #endif

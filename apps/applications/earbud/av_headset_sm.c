@@ -37,6 +37,10 @@
 static void appSmHandleInternalDeleteHandsets(void);
 static void appSmHandleInternalPairHandset(void);
 
+#ifdef AUTO_PAIRIING
+static void appSmHandleAutoPairing(const bdaddr *bd_addr);
+#endif
+
 /*****************************************************************************
  * SM utility functions
  *****************************************************************************/
@@ -344,6 +348,12 @@ static void appExitPeerPairing(void)
 static void appEnterHandsetPairing(void)
 {
     DEBUG_LOG("appEnterHandsetPairing");
+#ifdef	LIMIT_PEER
+	if(appPeerSyncUserPeerIsPairing())
+	{
+		return;
+	}
+#endif
 
     appSmDisconnectAndStartPairing();
     appPeerSyncSend(FALSE);
@@ -862,6 +872,7 @@ static void appSmHandleConManagerConnectionInd(CON_MANAGER_CONNECTION_IND_T* ind
 
     if (!ind->connected && appSmAllLinksAndProfilesAreDisconnected())
     {
+        DEBUG_LOG("clear all links");
         appSmLockClearConnectedLinks();
     }
 
@@ -944,7 +955,14 @@ static void appSmHandlePairingPeerPairConfirm(PAIRING_PEER_PAIR_CFM_T *cfm)
             /* Nothing to do, even if peer pairing succeeded, the final act of
                factory reset is to delete the peer pairing */
         break;
-
+			
+#ifdef INCLUDE_DUT
+        case APP_STATE_HANDSET_PAIRING:
+            /* Nothing to do, even if peer pairing succeeded, the final act of
+               factory reset is to delete the peer pairing */
+        break;
+#endif
+			
         default:
             switch (appGetSubState())
             {
@@ -1788,7 +1806,7 @@ static void appSmHandleHfpDisconnectedInd(APP_HFP_DISCONNECTED_IND_T *ind)
     {
         appSmLockClearConnectedLinks();
     }
-
+	
     switch (appGetState())
     {
         case APP_STATE_HANDSET_PAIRING:
@@ -1809,6 +1827,10 @@ static void appSmHandleHfpDisconnectedInd(APP_HFP_DISCONNECTED_IND_T *ind)
                    links, record that we're not connected with HFP to handset */
                 if (ind->reason == APP_HFP_DISCONNECT_NORMAL && !appSmIsDisconnectingLinks())
                     appDeviceSetHfpWasConnected(&ind->bd_addr, FALSE);
+
+#ifdef AUTO_PAIRIING
+					appSmHandleAutoPairing(&ind->bd_addr);
+#endif
             }
         }
         break;
@@ -1837,7 +1859,7 @@ static void appSmHandleHfpScoDisconnectedInd(void)
 
 static void appSmHandleInternalPairHandset(void)
 {
-    if (appSmStateIsIdle(appGetState()) || (appSmReconnectAndPairing()))
+    if ((appSmStateIsIdle(appGetState()) && (!appPeerSyncUserPeerIsPairing())) || (appSmReconnectAndPairing()))
     {
         appSmSetUserPairing();
         appSetState(APP_STATE_HANDSET_PAIRING);
@@ -2400,6 +2422,7 @@ void appSmConnectHandset(void)
 /*! \brief Request a factory reset. */
 void appSmFactoryReset(void)
 {
+	appUiButtonFactoryReset();
     MessageSend(appGetSmTask(), SM_INTERNAL_FACTORY_RESET, NULL);
 }
 
@@ -2547,6 +2570,50 @@ void ReconnectSetState(reconnectState new_state)
 reconnectState ReconnectGetState(void)
 {
     return appGetSm()->rec_state;
+}
+
+#endif
+
+#ifdef AUTO_PAIRIING
+static void appSmHandleAutoPairing(const bdaddr *bd_addr)
+{
+    appHfpDisconnectReason reason = appHfpGetDisconnectReason();
+
+	DEBUG_LOGF("hfp disconnect reason is: %d", reason);
+
+	switch(reason)
+	{
+        case APP_HFP_CONNECT_FAILED:
+            break;
+			
+        case APP_HFP_DISCONNECT_LINKLOSS:
+            break;
+			
+        case APP_HFP_DISCONNECT_NORMAL:
+			/*正常断开*/
+			if(PHY_STATE_IN_CASE != appPhyStateGetState())
+			{
+				if (appDeviceIsTwsPlusHandset(bd_addr))
+				{/*如果是tws+的手机的话就固定左耳进pairing*/
+					if (appConfigIsLeft())
+					{
+						DEBUG_LOG("TWS+ handset");
+						appSmPairHandset();
+					}
+				}
+				else
+				{
+					DEBUG_LOG("TWS handset");
+				}
+			}
+            break;
+			
+        case APP_HFP_DISCONNECT_ERROR:
+            break;
+			
+        default:
+            break;
+	}
 }
 
 #endif

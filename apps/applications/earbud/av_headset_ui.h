@@ -13,6 +13,7 @@
 #include <a2dp.h>
 #include "av_headset_kymera.h"
 #include "av_headset_led.h"
+#include "av_headset_config.h"
 
 /*! \brief Time between mute reminders (in seconds) */
 #define APP_UI_MUTE_REMINDER_TIME               (15)
@@ -27,10 +28,10 @@
 #define APP_UI_CONNECTING_TIME                  (5)
 
 /*! \brief Time between volume changes (in milliseconds) */
-#define APP_UI_VOLUME_REPEAT_TIME               (300)
+#define APP_UI_VOLUME_REPEAT_TIME               (400)/*(300)*/
 
 /*! \brief Fixed tone volume in dB */
-#define APP_UI_TONE_VOLUME                      (-20)
+#define APP_UI_TONE_VOLUME                      (-26)/*-20*/
 
 /*! \brief Fixed prompt volume in dB */
 #define APP_UI_PROMPT_VOLUME                    (-10)
@@ -50,6 +51,9 @@ typedef enum prompt_name
     PROMPT_PAIRING_FAILED,
     PROMPT_CONNECTED,
     PROMPT_DISCONNECTED,
+#ifdef BATTERY_LOW
+    PROMPT_BATTERY_LOW,
+#endif
     NUMBER_OF_PROMPTS,
     PROMPT_NONE = 0xffff,
 } voicePromptName;
@@ -116,6 +120,7 @@ extern const ledPattern app_led_pattern_sco[];
 extern const ledPattern app_led_pattern_call_incoming[];
 extern const ledPattern app_led_pattern_battery_empty[];
 extern const ledPattern app_led_pattern_peer_pairing[];
+extern const ringtone_note app_tone_button_factory_reset[];
 
 extern const ringtone_note app_tone_button[];
 
@@ -152,6 +157,10 @@ extern const ringtone_note app_tone_peer_pairing_error[];
 #ifdef INCLUDE_DFU
 extern const ledPattern app_led_pattern_dfu[];
 extern const ringtone_note app_tone_dfu[];
+#endif
+
+#ifdef INCLUDE_DUT
+extern uint16 app_led_filter_DUT(uint16 led_state);
 #endif
 
 #ifdef INCLUDE_AV
@@ -317,7 +326,7 @@ extern const ringtone_note app_tone_av_link_loss[];
 
 /*! \brief Play AV volume up tone */
 #define appUiAvVolumeUp() \
-   appUiPlayToneInterruptible(app_tone_volume)
+   appUiPlayTone(app_tone_volume)
 
 /*! \brief Play AV volume limit reached tone */
 #define appUiAvVolumeLimit() \
@@ -504,6 +513,11 @@ do \
     appLedSetFilter(app_led_filter_charging_complete, 1)
 #endif
 
+#ifdef INCLUDE_DUT
+/*! \brief Charger charging complete, enable charging complete filter */
+#define appUiDut() \
+    appLedSetFilter(app_led_filter_DUT, 1)
+#endif
 extern void appUiInit(void);
 extern void appUiPlayToneCore(const ringtone_note *tone, bool interruptible,
                               uint16 *client_lock, uint16 client_lock_mask);

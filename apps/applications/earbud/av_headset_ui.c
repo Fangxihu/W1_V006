@@ -58,6 +58,7 @@ enum ui_internal_messages
 #define LED_0_STATE  (1 << 0)
 #define LED_1_STATE  (1 << 1)
 #define LED_2_STATE  (1 << 2)
+#define LED_ALL  (LED_0_STATE | LED_1_STATE | LED_2_STATE)
 #elif (appConfigNumberOfLeds() == 2)
 /* We only have 2 LED so map all control to the same LED */
 #define LED_0_STATE  (1 << 0)
@@ -136,6 +137,15 @@ uint16 app_led_filter_charging_finish(uint16 led_state)
     return 0;
 }
 #endif
+
+#ifdef INCLUDE_DUT
+uint16 app_led_filter_DUT(uint16 led_state)
+{
+    UNUSED(led_state);
+    return (LED_BLUE | LED_RED);
+}
+#endif
+
 /*! \cond led_patterns_well_named
     No need to document these. The public interface is
     from public functions such as appUiPowerOn()
@@ -185,10 +195,9 @@ const ledPattern app_led_pattern_idle[] =
 #ifdef RECONNECT_HANDSET
 const ledPattern app_led_pattern_reconnecting[] = 
 {
-    LED_LOCK,
     LED_SYNC(1000),
-    LED_ON(LED_WHITE), LED_WAIT(50), LED_OFF(LED_WHITE), LED_WAIT(50),
-    LED_REPEAT(2, 1),
+    LED_LOCK,
+    LED_ON(LED_BLUE), LED_WAIT(200), LED_OFF(LED_BLUE),
     LED_UNLOCK,
     LED_REPEAT(0, 0),
 };
@@ -233,9 +242,7 @@ const ledPattern app_led_pattern_peer_pairing[] =
 const ledPattern app_led_pattern_dfu[] = 
 {
     LED_LOCK,
-    LED_ON(LED_RED), LED_WAIT(100), LED_OFF(LED_RED), LED_WAIT(100),
-    LED_REPEAT(1, 2),
-    LED_WAIT(400),
+    LED_ON(LED_RED), LED_WAIT(200), LED_OFF(LED_RED), LED_WAIT(800),
     LED_UNLOCK,
     LED_REPEAT(0, 0)
 };

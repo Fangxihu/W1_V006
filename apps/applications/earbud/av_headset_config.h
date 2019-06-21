@@ -28,6 +28,19 @@
 /*电量显示百分比调整，和低版本HFP没电量显示问题*/
 #define BATTERY_COMPENSATION
 
+/*设备名问题
+appHandleClDmLocalNameComplete*/
+
+/*防止同时进配对、同时回连，对对耳进行限制*/
+#define LIMIT_PEER
+
+//PEER_SWTICH
+
+/*断开的时候，自动配对的处理*/
+#define AUTO_PAIRIING
+
+
+//SINGLE_PEER
 
 /*==============================END==============================*/
 

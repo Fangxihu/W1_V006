@@ -346,6 +346,15 @@ static void appPeerSyncUpdatePeerIsPairing(bool peer_is_pairing)
 	{
 		DEBUG_LOGF("Peer enter Pairing Prev %u New %u", current_peer_is_pairing_state, peer_is_pairing);
 		appPairingClearPopupaddress();
+#ifdef	LIMIT_PEER
+		if(appGetState() == APP_STATE_HANDSET_PAIRING)
+		{
+			if(appConfigIsRight())	{
+				DEBUG_LOG("Cancel right!");
+				appPairingHandsetPairCancel();
+			}
+		}
+#endif
 	}
 	else if (current_peer_is_pairing_state && !peer_is_pairing)
 	{

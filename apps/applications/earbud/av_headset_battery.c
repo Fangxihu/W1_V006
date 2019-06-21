@@ -31,12 +31,21 @@ enum headset_battery_internal_messages
 {
         /*! Message sent to trigger an intermittent battery measurement */
     MESSAGE_BATTERY_INTERNAL_MEASUREMENT_TRIGGER = 1,
+    
+#ifdef BATTERY_LOW
+	MESSAGE_BATTERY_INTERNAL_BATTERY_LOW,
+#endif
 
     MESSAGE_BATTERY_TEST_PROCESS_READING = MESSAGE_BATTERY_PROCESS_READING,
 };
 
 /*! TRUE when the filter is filled with results */
 #define FILTER_IS_FULL(battery) ((battery)->filter.index >= BATTERY_FILTER_LEN)
+
+#ifdef BATTERY_LOW
+void appBatterySendBatteryLow(void);
+void appBatteryHandleBatteryLow(void);
+#endif
 
 /*! Add a client to the list of clients */
 static bool appBatteryClientAdd(batteryTaskData *battery, batteryRegistrationForm *form)
@@ -284,6 +293,17 @@ static void appBatteryServiceClients(batteryTaskData *battery)
                 if (stateUpdateIsRequired(client->last.state, new_state, voltage, hysteresis))
                 {
                     MESSAGE_MAKE(msg, MESSAGE_BATTERY_LEVEL_UPDATE_STATE_T);
+#ifdef BATTERY_LOW
+					if(battery_level_critical == new_state)
+					{
+						appBatterySendBatteryLow();
+					}
+					else
+					{
+						appBatteryCancelBatteryLow();
+						appUiUserBatteryLowCancel();
+					}
+#endif
                     msg->state = new_state;
                     client->last.state = new_state;
                     MessageSend(client->form.task, MESSAGE_BATTERY_LEVEL_UPDATE_STATE, msg);
@@ -347,6 +367,45 @@ static bool appBatteryAdcResultHandler(batteryTaskData *battery, MessageAdcResul
     return FALSE;
 }
 
+#ifdef BATTERY_LOW
+void appBatteryCancelBatteryLow(void)
+{
+	batteryTaskData *battery = appGetBattery();
+	MessageCancelAll(&battery->task, MESSAGE_BATTERY_INTERNAL_BATTERY_LOW);
+}
+
+void appBatterySendBatteryLow(void)
+{
+	batteryTaskData *battery = appGetBattery();
+	appBatteryCancelBatteryLow();
+	MessageSend(&battery->task, MESSAGE_BATTERY_INTERNAL_BATTERY_LOW, NULL);
+}
+
+void appBatteryHandleBatteryLow(void)
+{
+	batteryTaskData *battery = appGetBattery();
+	appBatteryCancelBatteryLow();
+	if (appSmIsOutOfCase())
+	{
+		appUiUserBatteryLow();
+	}
+	MessageSendLater(&battery->task, MESSAGE_BATTERY_INTERNAL_BATTERY_LOW,
+	                    NULL, D_SEC(60));
+}
+
+void appBatteryLowCheck(void)
+{
+	batteryTaskData *battery = appGetBattery();
+
+	if(battery_level_critical == appBatteryGetState())
+	{
+		MessageSendLater(&battery->task, MESSAGE_BATTERY_INTERNAL_BATTERY_LOW,
+		                    NULL, D_SEC(5));
+	}
+}
+
+#endif
+
 static void appBatteryHandleMessage(Task task, MessageId id, Message message)
 {
     batteryTaskData *battery = (batteryTaskData *)task;
@@ -370,6 +429,12 @@ static void appBatteryHandleMessage(Task task, MessageId id, Message message)
                 AdcReadRequest(&battery->task, adcsel_vref_hq_buff, 0, 0);
                 AdcReadRequest(&battery->task, adcsel_pmu_vbat_sns, 0, 0);
                 break;
+				
+#ifdef BATTERY_LOW
+            case MESSAGE_BATTERY_INTERNAL_BATTERY_LOW:
+                appBatteryHandleBatteryLow();
+                break;
+#endif
 
             default:
                 /* An unexpected message has arrived - must handle it */

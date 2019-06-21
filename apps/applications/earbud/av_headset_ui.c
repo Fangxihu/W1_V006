@@ -121,7 +121,11 @@ uint16 app_led_filter_charging_ok(uint16 led_state)
 uint16 app_led_filter_charging_complete(uint16 led_state)
 {
     UNUSED(led_state);
+#if (appConfigNumberOfLeds() == 1)
+    return LED_RED;
+#else
     return LED_BLUE;
+#endif
 }
 
 #ifdef CHG_FINISH_LED
@@ -176,22 +180,64 @@ const ledPattern app_led_pattern_power_off[] =
 
 const ledPattern app_led_pattern_error[] = 
 {
+#ifdef W1_LED
+    LED_LOCK,
+    LED_OFF(LED_BLUE), LED_WAIT(100),
+    LED_UNLOCK,
+    LED_END
+#else
     LED_LOCK,
     LED_ON(LED_RED), LED_WAIT(100), LED_OFF(LED_RED), LED_WAIT(100),
     LED_REPEAT(1, 2),
     LED_UNLOCK,
     LED_END
+#endif
 };
 
 const ledPattern app_led_pattern_idle[] = 
 {
+#ifdef W1_LED
+    LED_LOCK,
+    LED_OFF(LED_BLUE), LED_WAIT(100),
+    LED_UNLOCK,
+    LED_END
+#else
     LED_SYNC(2000),
     LED_LOCK,
     LED_ON(LED_BLUE), LED_WAIT(100), LED_OFF(LED_BLUE),
     LED_UNLOCK,
     LED_REPEAT(0, 0),
+#endif
 };
-	
+
+const ledPattern app_led_pattern_idle_connected[] = 
+{
+#ifdef W1_LED
+    LED_LOCK,
+    LED_OFF(LED_BLUE), LED_WAIT(100),
+    LED_UNLOCK,
+    LED_END
+#else
+    LED_SYNC(1000),
+    LED_LOCK,
+    LED_ON(LED_BLUE), LED_WAIT(100), LED_OFF(LED_BLUE),
+    LED_UNLOCK,
+    LED_REPEAT(0, 0),
+#endif
+};
+
+const ledPattern app_led_pattern_pairing[] = 
+{
+    LED_LOCK,
+#if (appConfigNumberOfLeds() == 1)
+    LED_ON(LED_RED), LED_WAIT(400), LED_OFF(LED_RED), LED_WAIT(600),
+#else
+    LED_ON(LED_BLUE), LED_WAIT(150), LED_OFF(LED_BLUE), LED_WAIT(150),
+    LED_ON(LED_RED), LED_WAIT(150), LED_OFF(LED_RED), LED_WAIT(150),
+#endif
+    LED_UNLOCK,
+    LED_REPEAT(0, 0)
+};
 #ifdef RECONNECT_HANDSET
 const ledPattern app_led_pattern_reconnecting[] = 
 {
@@ -203,31 +249,20 @@ const ledPattern app_led_pattern_reconnecting[] =
 };
 #endif
 
-const ledPattern app_led_pattern_idle_connected[] = 
-{
-    LED_SYNC(1000),
-    LED_LOCK,
-    LED_ON(LED_BLUE), LED_WAIT(100), LED_OFF(LED_BLUE),
-    LED_UNLOCK,
-    LED_REPEAT(0, 0),
-};
-
-const ledPattern app_led_pattern_pairing[] = 
-{
-    LED_LOCK,
-    LED_ON(LED_BLUE), LED_WAIT(150), LED_OFF(LED_BLUE), LED_WAIT(150),
-    LED_ON(LED_RED), LED_WAIT(150), LED_OFF(LED_RED), LED_WAIT(150),
-    LED_UNLOCK,
-    LED_REPEAT(0, 0)
-};
-
 const ledPattern app_led_pattern_pairing_deleted[] = 
 {
+#ifdef W1_LED
+    LED_LOCK,
+    LED_OFF(LED_BLUE), LED_WAIT(100),
+    LED_UNLOCK,
+    LED_END
+#else
     LED_LOCK,
     LED_ON(LED_BLUE), LED_WAIT(100), LED_OFF(LED_BLUE), LED_WAIT(100),
     LED_REPEAT(1, 2),
     LED_UNLOCK,
     LED_END
+#endif
 };
 
 const ledPattern app_led_pattern_peer_pairing[] =
@@ -251,6 +286,12 @@ const ledPattern app_led_pattern_dfu[] =
 #ifdef INCLUDE_AV
 const ledPattern app_led_pattern_streaming[] =
 {
+#ifdef W1_LED
+    LED_LOCK,
+    LED_OFF(LED_BLUE), LED_WAIT(100),
+    LED_UNLOCK,
+    LED_END
+#else
     LED_SYNC(2000),
     LED_LOCK,
     LED_ON(LED_BLUE), LED_WAIT(50), LED_OFF(LED_BLUE), LED_WAIT(50),
@@ -258,12 +299,19 @@ const ledPattern app_led_pattern_streaming[] =
     LED_WAIT(500),
     LED_UNLOCK,
     LED_REPEAT(0, 0),
+#endif
 };
 #endif
 
 #ifdef INCLUDE_AV
 const ledPattern app_led_pattern_streaming_aptx[] =
 {
+#ifdef W1_LED
+    LED_LOCK,
+    LED_OFF(LED_BLUE), LED_WAIT(100),
+    LED_UNLOCK,
+    LED_END
+#else
     LED_SYNC(2000),
     LED_LOCK,
     LED_ON(LED_BLUE), LED_WAIT(50), LED_OFF(LED_BLUE), LED_WAIT(50),
@@ -271,11 +319,18 @@ const ledPattern app_led_pattern_streaming_aptx[] =
     LED_WAIT(500),
     LED_UNLOCK,
     LED_REPEAT(0, 0),
+#endif
 };
 #endif
 
 const ledPattern app_led_pattern_sco[] = 
 {
+#ifdef W1_LED
+    LED_LOCK,
+    LED_OFF(LED_BLUE), LED_WAIT(100),
+    LED_UNLOCK,
+    LED_END
+#else
     LED_SYNC(2000),
     LED_LOCK,
     LED_ON(LED_BLUE), LED_WAIT(50), LED_OFF(LED_BLUE), LED_WAIT(50),
@@ -283,25 +338,45 @@ const ledPattern app_led_pattern_sco[] =
     LED_WAIT(500),
     LED_UNLOCK,
     LED_REPEAT(0, 0),
+#endif
 };
 
 const ledPattern app_led_pattern_call_incoming[] = 
 {
+#ifdef W1_LED
+	LED_SYNC(2000),
+	LED_LOCK,
+	LED_ON(LED_WHITE), LED_WAIT(50), LED_OFF(LED_WHITE), LED_WAIT(50),
+	LED_REPEAT(2, 1),
+	LED_WAIT(500),
+	LED_UNLOCK,
+	LED_REPEAT(0, 0),
+#else
     LED_LOCK,
     LED_SYNC(1000),
     LED_ON(LED_WHITE), LED_WAIT(50), LED_OFF(LED_WHITE), LED_WAIT(50),
     LED_REPEAT(2, 1),
     LED_UNLOCK,
     LED_REPEAT(0, 0),
+#endif
 };
 
 const ledPattern app_led_pattern_battery_empty[] = 
 {
+#ifndef BATTERY_LOW
     LED_LOCK,
     LED_ON(LED_RED),
     LED_REPEAT(1, 2),
     LED_UNLOCK,
     LED_END
+#else
+    LED_LOCK,
+    LED_ON(LED_RED), LED_WAIT(100), LED_OFF(LED_RED), LED_WAIT(100),
+    LED_REPEAT(1, 2),
+    LED_WAIT(1000),
+    LED_UNLOCK,
+    LED_REPEAT(0, 0)
+#endif
 };
 /*! \endcond led_patterns_well_named
  */
@@ -821,6 +896,179 @@ void appUiSleep(void)
     appLedEnable(FALSE);
 }
 
+#ifdef INCLUDE_FTSINGLEPEER
+bool appUiFTSingleGet(void)
+{
+    uiTaskData *theUi = appGetUi();
+
+    return theUi->ftsingle_flag;
+}
+
+void appUiFTSingleSet(bool value)
+{
+    uiTaskData *theUi = appGetUi();
+
+    theUi->ftsingle_flag = value;
+}
+
+#endif
+
+/**/
+#ifdef MULTI_TAP
+static void appTapFunction(void)
+{
+    uiTaskData *theUi = appGetUi();
+    theUi->tap_count = theUi->tap_count + 1;
+    MessageCancelAll(&theUi->task, UI_INTERNAL_MULTI_TAP);
+    MessageSendLater(&theUi->task, UI_INTERNAL_MULTI_TAP, NULL, 500);
+    DEBUG_LOGF("tap_count = %d", theUi->tap_count);
+}
+
+static void appUiMultiTapHandle(void)
+{
+	uiTaskData *theUi = appGetUi();
+	uint8 key_count = theUi->tap_count;
+	theUi->tap_count = 0;
+	MessageCancelAll(&theUi->task, UI_INTERNAL_MULTI_TAP);
+	
+	switch(key_count)
+	{
+		case 1:
+			DEBUG_LOG("key single!!!");
+			if (appSmIsOutOfCase())
+			{
+                /* If incoming voice call, accept */
+                /*else */if (appHfpIsCallIncoming())
+                    appHfpCallAccept();
+                else if (appScoFwdIsCallIncoming())
+                    appScoFwdCallAccept();
+                /* If AVRCP to handset connected, send play or pause */
+                else if ((appDeviceIsHandsetAvrcpConnected())/*&& appDeviceIsHandsetA2dpConnected()*/)/*add by fang 20190121*/
+                    appAvPlayToggle(TRUE);
+                /* If AVRCP is peer is connected and peer is connected to handset, send play or pause */
+                else if (appDeviceIsPeerAvrcpConnectedForAv() && appPeerSyncIsComplete() && appPeerSyncIsPeerHandsetAvrcpConnected())
+                    appAvPlayToggle(TRUE);
+                else if (appDeviceIsHandsetHfpConnected() && appDeviceIsHandsetA2dpConnected())
+                    appUiError();
+                else
+                {
+                    appSmConnectHandset();
+                    appUiAvConnect();
+                }
+            }
+		break;
+			
+		case 2:
+		{
+			DEBUG_LOG("key double!!!_forward");
+	            if (appSmIsOutOfCase())
+	            {
+					/* If voice call active, hangup */
+					if (appHfpIsCallActive())
+						appHfpCallHangup();
+						/* Sco Forward can be streaming a ring tone */
+					else if (appScoFwdIsReceiving() && !appScoFwdIsCallIncoming())
+						appScoFwdCallHangup();
+					/* If outgoing voice call, hangup */
+					else if (appHfpIsCallOutgoing())
+						appHfpCallHangup();
+	                else if (appHfpIsCallIncoming())
+	                    appHfpCallReject();
+	                else if (appScoFwdIsCallIncoming())
+	                    appScoFwdCallReject();
+	                else
+	                	{
+		                	if(appConfigIsLeft())
+	                		{
+								appAvBackward();
+	                		}
+							else
+								appAvForward();
+						}
+	            }
+		}
+		break;
+		
+		case 3:
+		{
+			DEBUG_LOG("key three!!!_backward");
+#ifdef INCLUDE_FTSINGLEPEER
+			if ((PHY_STATE_IN_CASE != appPhyStateGetState()) && (!(theUi->ftsingle_flag))\
+				&& ((appGetState() == APP_STATE_STARTUP) || (appGetState() == APP_STATE_PEER_PAIRING)))
+			{
+				DEBUG_LOG("DUT_modle!!!");
+				appUiFTSingleSet(TRUE);
+				Dut_User_Exit_Peer_Pairing();
+			}
+#endif
+			if (appSmIsOutOfCase())
+			{
+				appHfpCallVoice();
+			}
+		}
+		break;
+		
+		case 4:
+		{
+			DEBUG_LOG("key four!!!_forward");
+#ifdef EQ_TUNING
+			if (appSmIsOutOfCase())
+				appTestPhyStateInCaseEvent();
+			else if (appSmIsInCase())
+				appTestPhyStateOutOfCaseEvent();
+#endif
+		}
+		break;
+		
+		case 5:
+		{
+			DEBUG_LOG("key five!!!_dfu");
+#ifdef INCLUDE_DUT
+            if ((PHY_STATE_IN_CASE != appPhyStateGetState()) && (!(theUi->dut_flag)))
+            {
+                DEBUG_LOG("DUT_modle!!!");
+                appUiDut();
+                Dut_User_Exit_Peer_Pairing();
+                MessageSendLater(&theUi->task, UI_INTERNAL_DUT, NULL, 1000);
+            }
+#endif
+		}
+		break;
+		
+		case 7:
+		{
+			DEBUG_LOG("key 7!!!_ft");
+#ifdef INCLUDE_DFU
+            if (appSmIsOutOfCase() && appUpgradeUiDfuRequest())
+                appUiDfuRequested();
+#else
+#endif /* INCLUDE_DFU */
+		}
+		break;
+		
+		case 9:
+		{
+			DEBUG_LOG("key nine!!!_power off");
+			/*appPowerOffRequest();*/
+            if (appSmIsOutOfCase())
+        	{
+				appSmFactoryReset();
+        	}
+		}
+		break;
+		
+		case 15:
+		{
+            DEBUG_LOG("key 15!!!_DUT");
+		}
+		break;
+
+		default:
+			break;
+	}
+}
+#endif
+
 /*! \brief Message Handler
 
     This function is the main message handler for the UI module, all user button
@@ -844,338 +1092,178 @@ static void appUiHandleMessage(Task task, MessageId id, Message message)
         case UI_INTERNAL_CLEAR_LAST_PROMPT:
             theUi->prompt_last = PROMPT_NONE;
         break;
+		
+#ifdef MULTI_TAP
+        case UI_INTERNAL_MULTI_TAP:
+            appUiMultiTapHandle();
+        break;
+#endif
+
+#ifdef INCLUDE_DUT
+        case UI_INTERNAL_DUT:
+		MessageCancelAll(&theUi->task, UI_INTERNAL_DUT);
+		theUi->dut_flag = TRUE;
+		ConnectionEnterDutMode();
+        break;
+#endif
 
         /* HFP call/reject & A2DP play/pause */
         case APP_MFB_BUTTON_PRESS:
         {
             DEBUG_LOG("APP_MFB_BUTTON_PRESS");
-            if (appSmIsOutOfCase())
-            {
-                /* If voice call active, hangup */
-                if (appHfpIsCallActive())
-                    appHfpCallHangup();
-                    /* Sco Forward can be streaming a ring tone */
-                else if (appScoFwdIsReceiving() && !appScoFwdIsCallIncoming())
-                    appScoFwdCallHangup();
-                /* If outgoing voice call, hangup */
-                else if (appHfpIsCallOutgoing())
-                    appHfpCallHangup();
-                /* If incoming voice call, accept */
-                else if (appHfpIsCallIncoming())
-                    appHfpCallAccept();
-                else if (appScoFwdIsCallIncoming())
-                    appScoFwdCallAccept();
-                /* If AVRCP to handset connected, send play or pause */
-                else if (appDeviceIsHandsetAvrcpConnected())
-                    appAvPlayToggle(TRUE);
-                /* If AVRCP is peer is connected and peer is connected to handset, send play or pause */
-                else if (appDeviceIsPeerAvrcpConnectedForAv() && appPeerSyncIsComplete() && appPeerSyncIsPeerHandsetAvrcpConnected())
-                    appAvPlayToggle(TRUE);
-                else if (appDeviceIsHandsetHfpConnected() && appDeviceIsHandsetA2dpConnected())
-                    appUiError();
-                else
-                    appSmConnectHandset();
-            }
+#ifdef MULTI_TAP
+			appTapFunction();
+#endif
         }
         break;
-
+			
         case APP_MFB_BUTTON_1_SECOND:
         {
             DEBUG_LOG("APP_MFB_BUTTON_1_SECOND");
-            if (appSmIsOutOfCase())
-            {
-                if (appHfpIsCallActive())  /* Mic Mute not handled for SCO Fwding */
-                {
-                    if (appHfpIsScoActive())
-                        appHfpTransferToAg();
-                    else
-                        appHfpTransferToHeadset();
-                }
-                else if (appHfpIsCallIncoming())
-                    appHfpCallReject();
-                else if (appScoFwdIsCallIncoming())
-                    appScoFwdCallReject();
-                else if (appAvHasAConnection())
-                    appAvStop(TRUE);
-                else
-                    appUiAvError(FALSE);
-            }
         }
         break;
-
-#ifdef APP_BUTTON_HELD_1
-        case APP_BUTTON_HELD_1:
-#endif
+		
         case APP_MFB_BUTTON_HELD_1:
             DEBUG_LOG("APP_(MFB)_BUTTON_HELD_1");
-            if (appSmIsOutOfCase())
-                appUiButton();
             break;
 
         case APP_MFB_BUTTON_HELD_2:
-            DEBUG_LOG("APP_MFB_BUTTON_HELD_2");
-            if (appSmIsOutOfCase())
-                appUiButton2();
-            break;
-
-        case APP_MFB_BUTTON_HELD_3:
             DEBUG_LOG("APP_MFB_BUTTON_HELD_3");
             if (appSmIsOutOfCase())
-                appUiButton3();
-            break;
-
-#ifdef APP_MFB_BUTTON_HELD_4
-        case APP_MFB_BUTTON_HELD_4:
-            DEBUG_LOG("APP_MFB_BUTTON_HELD_4");
-            if (appSmIsOutOfCase())
-                appUiButton4();
-            break;
+        	{
+#ifdef INCLUDE_DUT
+				if(theUi->dut_flag)
+				{
+					appSmReboot();
+				}
 #endif
-        /* Handset Pairing */
+				{
+				int16 num_steps, hfp_change, av_change;
+				if(appConfigIsLeft())
+					num_steps = -1; 		
+				else
+					num_steps = 1;			
+		
+				hfp_change = (appConfigGetHfpVolumeStep() * num_steps);
+				av_change = (appConfigGetAvVolumeStep() * num_steps);
+
+				if (appHfpIsScoActive())
+				{
+					appHfpVolumeStart(hfp_change);
+				}
+				else if (appScoFwdIsReceiving())
+				{
+					appScoFwdVolumeStart(hfp_change);
+				}
+#ifdef INCLUDE_AV
+				else if (appAvIsStreaming())
+				{
+					appAvVolumeStart(av_change);
+				}
+#endif
+				else if (appHfpIsConnected())
+				{
+					appHfpVolumeStart(hfp_change);
+				}
+				else if (appScoFwdIsConnected())
+				{
+					appScoFwdVolumeStart(hfp_change);
+				}
+				else
+				{
+					appUiHfpError(FALSE);
+				}
+				}
+        	}
+			else if(PHY_STATE_IN_CASE != appPhyStateGetState())
+			{
+#ifdef INCLUDE_DUT
+				if(theUi->dut_flag)
+				{
+					appSmReboot();
+				}
+#endif
+			}
+            break;
+			
+        case APP_MFB_BUTTON_2_SECOND:
+        {
+			int16 vol_dir, hfp_change_vol, av_change_vol;
+			if(appConfigIsLeft())
+				vol_dir = -1; 		
+			else
+				vol_dir = 1;	
+			hfp_change_vol = (appConfigGetHfpVolumeStep() * vol_dir);
+			av_change_vol = (appConfigGetAvVolumeStep() * vol_dir);
+			
+            DEBUG_LOG("APP_MFB_BUTTON_3_SECOND");
+			if (appHfpIsScoActive())
+				appHfpVolumeStop(hfp_change_vol);
+			else if (appScoFwdIsReceiving())
+				appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
+#ifdef INCLUDE_AV
+			else if (appAvIsStreaming())
+				appAvVolumeStop(av_change_vol);
+#endif
+			else if (appHfpIsConnected())
+				appHfpVolumeStop(hfp_change_vol);
+			else if (appScoFwdIsConnected())
+				appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
+			/*! \todo why no else with UiHfpError() ? */
+        }
+        break;
+
         case APP_MFB_BUTTON_6_SECOND:
+        {
             DEBUG_LOG("APP_MFB_BUTTON_6_SECOND");
-            if (appSmIsOutOfCase())
-            {
-                if (!appSmIsPairing())
-                    appSmPairHandset();
-                else
-                {
-                    // TODO: Cancel pairing
-                }
-            }
-            break;
-
-        /* Delete Handset Pairings */
-        case APP_MFB_BUTTON_8_SECOND:
-            DEBUG_LOG("APP_MFB_BUTTON_6_SECOND");
-            if (appSmIsOutOfCase())
-                appSmDeleteHandsets();
-            break;
-
-#if defined(HAVE_6_BUTTONS) || defined(HAVE_9_BUTTONS)
-
-        /* Mute Volume */
-        case APP_BUTTON_VOLUME_UP_DOWN:
-        {
-            DEBUG_LOG("APP_BUTTON_VOLUME_UP_DOWN");
-            if (appSmIsOutOfCase())
-            {
-                /* Make sure any volume change repeat in progress is cancelled */
-                if (appHfpIsScoActive())
-                    appHfpVolumeStop(0);
-#ifdef INCLUDE_AV
-                else if (appAvIsStreaming())
-                    appAvVolumeStop(0);
+#ifdef SYNC_FT_RESET
+			appScoFwdSyncFactoryResetSet(FALSE);
 #endif
-                else if (appHfpIsConnected())
-                    appHfpVolumeStop(0);
-
-                if (appHfpIsScoActive())
-                    appHfpMuteToggle();
-                else
-                    appUiHfpError(FALSE);
-            }
         }
         break;
-
-        /* Volume Down */
-        case APP_BUTTON_VOLUME_DOWN:
-        {
-            DEBUG_LOG("APP_BUTTON_VOLUME_DOWN");
-            uint16 num_pending_msgs = MessageCancelAll(appGetUiTask(), APP_BUTTON_VOLUME_DOWN);
-
+		
+        case APP_MFB_BUTTON_HELD_6:
+            DEBUG_LOG("APP_MFB_BUTTON_HELD_6");
             if (appSmIsOutOfCase())
-            {
-                uint16 num_steps = num_pending_msgs + 1;
-                int16 hfp_change = - (appConfigGetHfpVolumeStep() * num_steps);
-                int16 av_change = - (appConfigGetAvVolumeStep() * num_steps);
-
-                if (appHfpIsScoActive())
-                {
-                    appHfpVolumeStart(hfp_change);
-                }
-                else if (appScoFwdIsReceiving())
-                {
-                    appScoFwdVolumeStart(hfp_change);
-                }
-#ifdef INCLUDE_AV
-                else if (appAvIsStreaming())
-                {
-                    appAvVolumeStart(av_change);
-                }
+        	{
+#ifdef SYNC_FT_RESET
+        		if(appConfigIsRight())
+    			{
+					appScoFwdSyncFactoryReset();
+				}
 #endif
-                else if (appHfpIsConnected())
-                {
-                    appHfpVolumeStart(hfp_change);
-                }
-                else if (appScoFwdIsConnected())
-                {
-                    appScoFwdVolumeStart(hfp_change);
-                }
-                else
-                {
-                    appUiHfpError(FALSE);
-                }
-            }
-        }
+        	}
         break;
 
-        /* Volume Up */
-        case APP_BUTTON_VOLUME_UP:
-        {
-            DEBUG_LOG("APP_BUTTON_VOLUME_UP");
-            uint16 num_pending_msgs = MessageCancelAll(appGetUiTask(), APP_BUTTON_VOLUME_UP);
-
-            if (appSmIsOutOfCase())
-            {
-                uint16 num_steps = num_pending_msgs + 1;
-                int16 hfp_change = appConfigGetHfpVolumeStep() * num_steps;
-                int16 av_change = appConfigGetAvVolumeStep() * num_steps;
-
-                if (appHfpIsScoActive())
-                {
-                    appHfpVolumeStart(hfp_change);
-                }
-                else if (appScoFwdIsReceiving())
-                {
-                    appScoFwdVolumeStart(hfp_change);
-                }
-#ifdef INCLUDE_AV
-                else if (appAvIsStreaming())
-                {
-                    appAvVolumeStart(av_change);
-                }
+		case APP_MFB_BUTTON_7_SECOND:
+		{
+			DEBUG_LOG("APP_MFB_BUTTON_7_SECOND");
+#ifdef SYNC_FT_RESET
+			appScoFwdSyncFactoryResetSet(FALSE);
 #endif
-                else if (appHfpIsConnected())
-                {
-                    appHfpVolumeStart(hfp_change);
-                }
-                else if (appScoFwdIsConnected())
-                {
-                    appScoFwdVolumeStart(av_change);
-                }
-                else
-                {
-                    appUiHfpError(FALSE);
-                }
-            }
-        }
-        break;
-
-        case APP_BUTTON_VOLUME_DOWN_RELEASE:
-        {
-            DEBUG_LOG("APP_BUTTON_VOLUME_DOWN_RELEASE");
-            if (appHfpIsScoActive())
-                appHfpVolumeStop(-appConfigGetHfpVolumeStep());
-            else if (appScoFwdIsReceiving())
-                appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
-#ifdef INCLUDE_AV
-            else if (appAvIsStreaming())
-                appAvVolumeStop(-appConfigGetAvVolumeStep());
+		}
+		break;
+		
+		case APP_MFB_BUTTON_HELD_7:
+			DEBUG_LOG("APP_MFB_BUTTON_HELD_7");
+			if (appSmIsOutOfCase())
+			{
+#ifdef SYNC_FT_RESET
+				if(appConfigIsLeft())
+				{
+					if(appScoFwdSyncFactoryResetGet())
+					{
+						appScoFwdSyncFactoryReset();
+						appSmFactoryReset();
+					}
+				}
+				else
+				{
+					appScoFwdSyncFactoryReset();
+				}
 #endif
-            else if (appHfpIsConnected())
-                appHfpVolumeStop(-appConfigGetHfpVolumeStep());
-            else if (appScoFwdIsConnected())
-                appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
-            /*! \todo why no else with UiHfpError() ? */
-        }
-        break;
-
-        case APP_BUTTON_VOLUME_UP_RELEASE:
-        {
-            DEBUG_LOG("APP_BUTTON_VOLUME_UP_RELEASE");
-            if (appHfpIsScoActive())
-                appHfpVolumeStop(appConfigGetHfpVolumeStep());
-            else if (appScoFwdIsReceiving())
-                appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
-#ifdef INCLUDE_AV
-            else if (appAvIsStreaming())
-                appAvVolumeStop(appConfigGetAvVolumeStep());
-#endif
-            else if (appHfpIsConnected())
-                appHfpVolumeStop(appConfigGetHfpVolumeStep());
-            else if (appScoFwdIsConnected())
-                appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
-            /*! \todo why no else with UiHfpError() ? */
-        }
-        break;
-
-        case APP_BUTTON_FORWARD:
-        {
-            if (appSmIsOutOfCase())
-                appAvForward();
-        }
-        break;
-
-        case APP_BUTTON_BACKWARD:
-        {
-            if (appSmIsOutOfCase())
-                appAvBackward();
-        }
-        break;
-
-        case APP_BUTTON_FORWARD_HELD:
-        {
-            if (appSmIsOutOfCase())
-                appAvFastForwardStart();
-        }
-        break;
-
-        case APP_BUTTON_FORWARD_HELD_RELEASE:
-        {
-             appAvFastForwardStop();
-        }
-        break;
-
-        case APP_BUTTON_BACKWARD_HELD:
-        {
-            if (appSmIsOutOfCase())
-                appAvRewindStart();
-        }
-        break;
-
-        case APP_BUTTON_BACKWARD_HELD_RELEASE:
-        {
-            appAvRewindStop();
-        }
-        break;
-
-#endif /* HAVE_6_BUTTONS || HAVE_9_BUTTONS */
-
-#ifdef INCLUDE_DFU
-        case APP_BUTTON_DFU:
-        {
-            if (appSmIsOutOfCase() && appSmIsOutOfEar() && appUpgradeUiDfuRequest())
-                appUiDfuRequested();
-        }
-        break;
-
-        case APP_BUTTON_HELD_DFU:
-        {
-            if (appSmIsOutOfCase() && appSmIsOutOfEar())
-                appUiButtonDfu();
-        }
-        break;
-
-#endif /* INCLUDE_DFU */
-
-        case APP_BUTTON_POWER_OFF:
-            appPowerOffRequest();
-            break;
-
-        case APP_BUTTON_FACTORY_RESET:
-        {
-            if (appSmIsOutOfCase())
-                appSmFactoryReset();
-        }
-        break;
-
-        case APP_BUTTON_HELD_FACTORY_RESET:
-        {
-            if (appSmIsOutOfCase())
-                appUiButtonFactoryReset();
-        }
-        break;
+			}
+		break;
     }
 }
 
@@ -1196,4 +1284,13 @@ void appUiInit(void)
     memset(theUi->prompt_file_indexes, FILE_NONE, sizeof(theUi->prompt_file_indexes));
 
     theUi->prompt_last = PROMPT_NONE;
+#ifdef MULTI_TAP
+    theUi->tap_count = 0;
+#endif
+#ifdef INCLUDE_DUT
+    theUi->dut_flag = FALSE;
+#endif
+#ifdef INCLUDE_FTSINGLEPEER
+	theUi->ftsingle_flag = FALSE;
+#endif
 }

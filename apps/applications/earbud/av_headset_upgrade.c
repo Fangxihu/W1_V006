@@ -289,6 +289,7 @@ static void appUpgradeHandleCaseTimeout(void)
 {
     DEBUG_LOG("appUpgradeHandleCaseTimeout. Timed out before inserting in case");
     appGetUpgrade()->enter_dfu_in_case = FALSE;
+	appUiDfuActiveCancel();
 }
 
 

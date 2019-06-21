@@ -14,6 +14,7 @@
 #include "av_headset_peer_signalling.h"
 #include "av_headset_battery.h"
 #include "av_headset_conn_rules.h"
+#include "av_headset_ui.h"
 
 #include <bdaddr.h>
 #include <panic.h>
@@ -307,6 +308,21 @@ static void appPeerSyncUpdatePeerInCase(bool peer_in_case)
     {
         DEBUG_LOGF("appPeerSyncUpdatePeerInCase Prev %u New %u", current_peer_in_case_state, peer_in_case);
         appConnRulesSetEvent(appGetSmTask(), RULE_EVENT_PEER_IN_CASE);
+#ifdef PEER_SWTICH
+		{
+			DEBUG_LOG("______________switch peer_____________");
+			if((ps->peer_a2dp_streaming) && (!appSmIsInCase()))
+			{
+				DEBUG_LOG("play true!");
+				appPeerSyncPeerPlayingMark();
+				/*appAvPlay(FALSE);*/
+			}
+			else
+			{
+				appPeerSyncPeerPlayingClear();
+			}
+		}
+#endif
     }
     else if (current_peer_in_case_state && !peer_in_case)
     {
@@ -623,6 +639,15 @@ static void appPeerSyncHandlePeerSigMsgChannelTxInd(const PEER_SIG_MSG_CHANNEL_R
                         ps->peer_hfp_connected,
                         hfp_handsfree_107_profile); // TODO: Get HFP profile version from peer
 
+#ifdef PEER_PAIRING_ALLOW_CONNECT
+
+	if ((ps->peer_a2dp_connected) || (ps->peer_avrcp_connected) || (ps->peer_hfp_connected))
+	{
+		DEBUG_LOG("debug 3 profile");
+		appPairingHandsetPairCancel();
+	}
+#endif
+
     if (!(was_supported & DEVICE_PROFILE_A2DP) & ps->peer_a2dp_connected)
     {
         appConnRulesSetEvent(appGetSmTask(), RULE_EVENT_PEER_A2DP_SUPPORTED);
@@ -904,4 +929,31 @@ bool appPeerSyncUserPeerIsPairing(void)
     peerSyncTaskData* ps = appGetPeerSync();
     return ps->peer_is_pairing;
 }
+
+#ifdef PEER_SWTICH
+bool appPeerSyncPeerPlaying(void)
+{
+	DEBUG_LOG("appPeerSyncPeerPlaying---");
+
+    peerSyncTaskData* ps = appGetPeerSync();
+    return ps->peer_switch_playing;
+}
+
+void appPeerSyncPeerPlayingClear(void)
+{
+	DEBUG_LOG("appPeerSyncPeerPlayingClear---");
+
+    peerSyncTaskData* ps = appGetPeerSync();
+    ps->peer_switch_playing = FALSE;
+}
+
+void appPeerSyncPeerPlayingMark(void)
+{
+	DEBUG_LOG("appPeerSyncPeerPlayingMark---");
+
+    peerSyncTaskData* ps = appGetPeerSync();
+    ps->peer_switch_playing = TRUE;
+}
+
+#endif
 

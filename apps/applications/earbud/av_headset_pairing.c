@@ -1498,9 +1498,47 @@ static void appHandleClDmInquireResult(pairingTaskData *thePairing, const CL_DM_
 static void appHandleClDmLocalNameComplete(CL_DM_LOCAL_NAME_COMPLETE_T *msg)
 {
     DEBUG_LOGF("appHandleClDmLocalNameComplete, status %d", msg->status);
+	
+/*Custom name*/
+#if 0
+	uint16 size_local_name = msg->size_local_name + 2;
 
-    /* Initialise pairing module, this will set EIR data */
-    appPairingInitialiseEir(msg->local_name, msg->size_local_name);
+	uint8 local_name[size_local_name];
+
+	memmove(local_name, msg->local_name, msg->size_local_name);
+
+	DEBUG_LOGF("size_local_name %d", size_local_name);
+
+	local_name[size_local_name -2] = '-';
+
+	if(appConfigIsLeft())
+	{
+		local_name[size_local_name -1] = 'L';
+	}
+	else
+	{
+		local_name[size_local_name -1] = 'R';
+	}
+#endif
+	if(appUiFTSingleGet() || (NAME_USER))	{
+        uint8 local_name[] = "W1-V28-R";
+		uint16 size_local_name = sizeof(local_name);
+		DEBUG_LOGF("size_local_name %d", size_local_name);
+
+		if(appConfigIsLeft())
+		{
+			local_name[size_local_name -2] = 'L';
+		}
+		
+		ConnectionChangeLocalName(size_local_name, local_name);
+		
+		appPairingInitialiseEir(local_name, size_local_name);
+	}
+	else
+	{
+	    /* Initialise pairing module, this will set EIR data */
+	    appPairingInitialiseEir(msg->local_name, msg->size_local_name);
+	}
 }
 
 

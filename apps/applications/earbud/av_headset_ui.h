@@ -69,6 +69,15 @@ typedef struct
     FILE_INDEX prompt_file_indexes[NUMBER_OF_PROMPTS];
     /*! The last prompt played, used to avoid repeating prompts */
     voicePromptName prompt_last;
+#ifdef MULTI_TAP
+    uint8 tap_count;
+#endif
+#ifdef INCLUDE_DUT
+    bool dut_flag:1;                /*!< User initiated pairing */
+#endif
+#ifdef INCLUDE_FTSINGLEPEER
+	bool ftsingle_flag:1;				/*!< for facotry test single peer*/
+#endif
 } uiTaskData;
 
 /*! Audio prompt configuration */
@@ -104,6 +113,14 @@ extern uint16 app_led_filter_charging_ok(uint16 led_state);
     \return The filtered led_state.
 */
 extern uint16 app_led_filter_charging_complete(uint16 led_state);
+
+#ifdef CHG_FINISH_LED
+/*! \brief The colour filter for the led_state applicable when charging is finish.
+    \param led_state The input state.
+    \return The filtered led_state.
+*/
+extern uint16 app_led_filter_charging_finish(uint16 led_state);
+#endif
 
 //!@{ \name LED pattern and ringtone note sequence arrays.
 extern const ledPattern app_led_pattern_power_on[];
@@ -396,12 +413,20 @@ extern const ringtone_note app_tone_av_link_loss[];
       MessageSendLater(appGetUiTask(), APP_INTERNAL_UI_CONNECTING_TIMEOUT, NULL, D_SEC(APP_UI_CONNECTING_TIME)); }
 
 /*! \brief Show LED pattern for idle headset */
+#ifdef W1_LED
+#define appUiIdleActive()
+#else
 #define appUiIdleActive() \
     appLedSetPattern(app_led_pattern_idle, LED_PRI_LOW)
+#endif
 
 /*! \brief Show LED pattern for connected headset */
+#ifdef W1_LED
+#define appUiIdleConnectedActive()
+#else
 #define appUiIdleConnectedActive() \
     appLedSetPattern(app_led_pattern_idle_connected, LED_PRI_LOW)
+#endif
 
 #ifdef RECONNECT_HANDSET
 /*! \brief Show LED pattern for connected headset */
@@ -414,8 +439,12 @@ extern const ringtone_note app_tone_av_link_loss[];
 #endif
 
 /*! \brief Cancel LED pattern for idle/connected headset */
+#ifdef W1_LED
+#define appUiIdleInactive()
+#else
 #define appUiIdleInactive() \
     appLedStopPattern(LED_PRI_LOW)
+#endif
 
 /*! \brief Play pairing start tone */
 #define appUiPairingStart() \
@@ -479,8 +508,22 @@ do \
 /*! \brief Play DFU active tone, show LED pattern */
 #define appUiDfuRequested() do { \
       appUiPlayTone(app_tone_dfu); \
-      appLedSetPattern(app_led_pattern_dfu, LED_PRI_EVENT); \
+      appLedSetPattern(app_led_pattern_dfu, LED_PRI_LOW); \
       } while(0)
+
+#define appUiDfuActiveCancel() \
+    appLedStopPattern(LED_PRI_LOW)
+
+#endif
+
+#ifdef BATTERY_LOW
+/*! \brief Play battery low prompt */
+#define appUiUserBatteryLow() \
+    { appUiPlayPrompt(PROMPT_BATTERY_LOW); \
+      appLedSetPattern(app_led_pattern_battery_empty, LED_PRI_EVENT); }
+
+#define appUiUserBatteryLowCancel() \
+    appLedStopPattern(LED_PRI_EVENT)
 
 #endif
 
@@ -513,6 +556,14 @@ do \
     appLedSetFilter(app_led_filter_charging_complete, 1)
 #endif
 
+#ifdef CHG_FINISH_LED
+#ifdef INCLUDE_CHARGER
+/*! \brief Charger charging finish, enable charging finish filter */
+#define appUiChargerFinish() \
+    appLedSetFilter(app_led_filter_charging_finish, 1)
+#endif
+#endif
+
 #ifdef INCLUDE_DUT
 /*! \brief Charger charging complete, enable charging complete filter */
 #define appUiDut() \
@@ -529,6 +580,10 @@ extern void appUiAvError(bool silent);
 extern void appUiPowerOn(void);
 extern void appUiPowerOff(uint16 *lock, uint16 lock_mask);
 extern void appUiSleep(void);
+#ifdef INCLUDE_FTSINGLEPEER
+extern bool appUiFTSingleGet(void);
+extern void appUiFTSingleSet(bool value);
+#endif
 /*! \brief Play a tone to completion */
 #define appUiPlayTone(tone) appUiPlayToneCore(tone, FALSE, NULL, 0)
 /*! \brief Play a tone allowing another tone/prompt/event to interrupt (stop) this tone

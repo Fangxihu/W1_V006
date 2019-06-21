@@ -484,6 +484,15 @@ static void appLinkPolicyUpdateRole(const bdaddr *bd_addr, hci_role role)
         	}
 
             theLp->av_sink_role = role;
+
+#ifdef PEER_SWTICH
+			if(appPeerSyncPeerPlaying())
+			{
+				DEBUG_LOG("----------play-------");
+				appPeerSyncPeerPlayingClear();
+				appAvPlay(FALSE);
+			}
+#endif
         }
     }
 

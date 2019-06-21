@@ -132,6 +132,89 @@ static  bool appChargerIsCharging(void)
         }
     }
 }
+/**************************************************************************/
+#ifdef CHG_FINISH_LED
+static void appChargerSendFinish(void)
+{
+	chargerTaskData *theCharger = appGetCharger();
+	MessageCancelAll(&theCharger->task, CHARGER_STATE_FINISH);
+	MessageSendLater(&theCharger->task, CHARGER_STATE_FINISH, NULL, D_SEC(30));
+}
+
+static void appChargerCancelFinish(void)
+{
+	chargerTaskData *theCharger = appGetCharger();
+	MessageCancelAll(&theCharger->task, CHARGER_STATE_FINISH);
+}
+
+static void appChargerExecuteFinish(void)
+{
+	appChargerCancelFinish();
+	
+	if(appUpgradeDfuPending())	{
+		return;
+	}
+#ifndef EQ_TUNING
+	appUiChargerFinish();
+	appPowerOffRequest();
+	/*appChargerForceDisable();*/
+	/*PsuConfigure(PSU_ALL, PSU_SMPS_INPUT_SEL_VBAT, 1);*/
+	appPowerDoPowerOff();
+#endif
+}
+
+/*==============================================*/
+static void appChargerCancelQuickREL(void)
+{
+	chargerTaskData *theCharger = appGetCharger();
+	MessageCancelAll(&theCharger->task, CHARGER_QUICK_RELEASE);
+}
+
+static void appChargerSendQuickREL(void)
+{
+	chargerTaskData *theCharger = appGetCharger();
+	appChargerCancelQuickREL();
+	MessageSendLater(&theCharger->task, CHARGER_QUICK_RELEASE, NULL, D_SEC(3));
+}
+
+static void appChargerHandleQuickREL(void)
+{
+	appChargerCancelQuickREL();
+	if(appSmIsInCase())
+	{
+		if(appConManagerAnyLinkConnected() || appHfpIsConnected() || appAvHasAConnection())
+		{
+			UserDisconnectAllLinks();
+		}
+		
+	}
+}
+
+#endif
+
+#ifdef	AUTO_ENTER_PAIR
+static void appChargerStatusDelaySend(void)
+{
+	chargerTaskData *theCharger = appGetCharger();
+    theCharger->charger_status_delay = TRUE;
+	MessageCancelAll(&theCharger->task, CHARGER_DELAY_HANDLE);
+	MessageSendLater(&theCharger->task, CHARGER_DELAY_HANDLE, NULL, 1500);
+}
+
+static void appChargerStatusDelayHandle(void)
+{
+	chargerTaskData *theCharger = appGetCharger();
+    theCharger->charger_status_delay = FALSE;
+	MessageCancelAll(&theCharger->task, CHARGER_DELAY_HANDLE);
+}
+
+bool appChargerStatusDelayGet(void)
+{
+	chargerTaskData *theCharger = appGetCharger();
+	return theCharger->charger_status_delay;
+}
+
+#endif
 
 /**************************************************************************/
 static void appChargerCheck(void)
@@ -194,9 +277,26 @@ static void appChargerCheck(void)
     /* Check if connected status has changed */
     if (is_connected != theCharger->is_connected)
     {
+		DEBUG_LOG("charger connected & disconnected change!!!");
+#ifdef CHG_FINISH_LED
+    	appChargerCancelFinish();
+		appChargerCancelQuickREL();
+#endif
         /* Check if disconnected */
         if (is_connected == CHARGER_DISCONNECTED)
         {
+#ifdef BATTERY_LOW
+		appBatteryLowCheck();
+#endif
+
+#ifdef INCLUDE_FTSINGLEPEER
+			if(appUiFTSingleGet())
+			{
+				appUiFTSingleSet(FALSE);
+				appSmDeletePairingAndReset();
+			}
+#endif
+
             /* Indicate charger disconnection */
             appUiChargerDisconnected();
 
@@ -216,8 +316,23 @@ static void appChargerCheck(void)
         {
             /* Inform all clients that charger has attached when old state was disconnected */
             if (theCharger->is_connected == CHARGER_DISCONNECTED)
+        	{
                 appTaskListMessageSendId(theCharger->client_tasks, CHARGER_MESSAGE_ATTACHED);
+        	}
+#ifdef INCLUDE_FTSINGLEPEER
+			if(appUiFTSingleGet())
+			{
+				UserDisconnectAllLinks();
+			}
+#endif
 
+#ifdef CHG_FINISH_LED
+        	appChargerSendQuickREL();
+#endif
+#ifdef BATTERY_LOW
+		appBatteryCancelBatteryLow();
+		appUiUserBatteryLowCancel();
+#endif
             /* Indicate charger connection */
             appUiChargerConnected();
 
@@ -250,7 +365,12 @@ static void appChargerCheck(void)
     {
         /* Check if we have finished charging */
         if (!is_charging && theCharger->is_charging)
+    	{
             appUiChargerComplete();
+#ifdef CHG_FINISH_LED
+			appChargerSendFinish();	
+#endif
+		}
         else if (is_charging)
         {
             if (appBatteryGetVoltage() > appConfigBatteryVoltageOk())
@@ -362,6 +482,26 @@ static void appChargerHandleMessage(Task task, MessageId id, Message message)
             appChargerCheck();
         break;
     }
+#ifdef CHG_FINISH_LED
+
+    switch (id)
+    {
+        case CHARGER_STATE_FINISH:
+            appChargerExecuteFinish();
+            break;
+
+        case CHARGER_QUICK_RELEASE:
+            appChargerHandleQuickREL();
+            break;
+#ifdef	AUTO_ENTER_PAIR
+        case CHARGER_DELAY_HANDLE:
+            appChargerStatusDelayHandle();
+            break;
+#endif
+        default:
+            break;
+    }
+#endif	
 }
 
 /* Set the configuration of the charger.

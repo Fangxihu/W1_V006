@@ -176,7 +176,7 @@ static void appPeerSigSetState(appPeerSigState state)
     peerSigTaskData *peer_sig = appGetPeerSig();
 
     appPeerSigState old_state = appPeerSigGetState();
-    DEBUG_LOGF("appPeerSigSetState, state %x", state);
+    DEBUG_LOGF("appPeerSigSetState, new state %x, old state %x", state, old_state);
 
     /* Handle state exit functions */
     switch (old_state)
@@ -600,6 +600,18 @@ static void appPeerSigHandleInternalStartupRequest(PEER_SIG_INTERNAL_STARTUP_REQ
 
                     /* ACL failed to open, move to 'Disconnected' state */
                     appPeerSigSetState(PEER_SIG_STATE_DISCONNECTED);
+
+#ifdef SINGLE_PEER
+					if(PHY_STATE_IN_CASE != appPhyStateGetState())
+					{
+						DEBUG_LOG("appSmIsOutOfCase___!!!");
+						if(appDeviceIsHandsetHfpDisconnected() && (!appDeviceIsHandsetA2dpConnected()))
+						{
+							DEBUG_LOG("HandsetHfp_DISConnected!!!");
+							appSmSinglePeerConHandset();
+						}
+					}
+#endif
                 }
             }
         }

@@ -124,6 +124,11 @@ typedef struct
 #if 0//def RECONNECT_HANDSET
 	bool			earbud_reconnect_handset;					/*!< SCOFWD muted the local volume */
 #endif
+
+#ifdef SYNC_FT_RESET
+	bool			factory_reset;					/*!< SCOFWD muted the local volume */
+#endif
+
 #ifdef INCLUDE_SCOFWD_TEST_MODE
     unsigned        percentage_to_drop;         /*!< Percentage of packets to not transmit */
     int             drop_multiple_packets;      /*!< A negative number indicates the number of consecutive 
@@ -343,6 +348,10 @@ enum av_headset_scofwd_ota_messages
 	SFWD_OTA_MSG_RECONNECT_HANDSET,
 	SFWD_OTA_MSG_RULE_CONNECT_USER,
 #endif
+#ifdef SYNC_FT_RESET
+	SFWD_OTA_MSG_FACTORY_RESET,
+#endif
+
 };
 
 
@@ -380,6 +389,14 @@ enum av_headset_scofwd_ota_messages
 
 extern void appScoFwdHandleHfpAudioConnectConfirmation(const HFP_AUDIO_CONNECT_CFM_T *cfm);
 extern void appScoFwdHandleHfpAudioDisconnectIndication(const HFP_AUDIO_DISCONNECT_IND_T *ind);
+
+#ifdef SYNC_FT_RESET
+extern bool appScoFwdSyncFactoryResetGet(void);
+
+extern void appScoFwdSyncFactoryResetSet(bool flag);
+
+extern void appScoFwdSyncFactoryReset(void);
+#endif
 
 #endif /* _AV_HEADSET_SCO_FWD_H_ */
 

@@ -48,6 +48,20 @@ typedef enum
     CHARGER_CONNECTED_NO_ERROR,    
 } chargerConnectionState;
 
+#ifdef CHG_FINISH_LED
+typedef enum
+{
+	CHARGER_STATE_LOW = 0x20,
+	CHARGER_STATE_OK,
+	CHARGER_STATE_COMPLETE,
+	CHARGER_STATE_FINISH,
+	CHARGER_QUICK_RELEASE,
+#ifdef	AUTO_ENTER_PAIR
+	CHARGER_DELAY_HANDLE,
+#endif
+};
+#endif
+
 /*! The charger module internal state */
 typedef struct
 {

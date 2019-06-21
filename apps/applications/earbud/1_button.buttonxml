@@ -38,18 +38,18 @@
         <messageName>APP_MFB_BUTTON_HELD_2</messageName>
         <buttonEvent>HELD</buttonEvent>
         <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-        <timeout_ms>3000</timeout_ms>
+        <timeout_ms>2000</timeout_ms>
     </message>
 
     <message>
-        <messageName>APP_BUTTON_POWER_OFF</messageName>
+        <messageName>APP_MFB_BUTTON_2_SECOND</messageName>
         <buttonEvent>HELD_RELEASE</buttonEvent>
         <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-        <timeout_ms>3000</timeout_ms>
+        <timeout_ms>2000</timeout_ms>
     </message>
 
     <message>
-        <messageName>APP_MFB_BUTTON_HELD_3</messageName>
+        <messageName>APP_MFB_BUTTON_HELD_6</messageName>
         <buttonEvent>HELD</buttonEvent>
         <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
         <timeout_ms>6000</timeout_ms>
@@ -63,45 +63,17 @@
     </message>
 
     <message>
-        <messageName>APP_MFB_BUTTON_HELD_4</messageName>
+        <messageName>APP_MFB_BUTTON_HELD_7</messageName>
         <buttonEvent>HELD</buttonEvent>
         <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-        <timeout_ms>8000</timeout_ms>
+        <timeout_ms>7000</timeout_ms>
     </message>
 
     <message>
-        <messageName>APP_MFB_BUTTON_8_SECOND</messageName>
+        <messageName>APP_MFB_BUTTON_7_SECOND</messageName>
         <buttonEvent>HELD_RELEASE</buttonEvent>
         <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-        <timeout_ms>8000</timeout_ms>
-    </message>
-
-    <message>
-        <messageName>APP_BUTTON_HELD_DFU</messageName>
-        <buttonEvent>HELD</buttonEvent>
-        <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-        <timeout_ms>12000</timeout_ms>
-    </message>
-
-    <message>
-        <messageName>APP_BUTTON_DFU</messageName>
-        <buttonEvent>HELD_RELEASE</buttonEvent>
-        <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-        <timeout_ms>12000</timeout_ms>
-    </message>
-
-    <message>
-       <messageName>APP_BUTTON_HELD_FACTORY_RESET</messageName>
-       <buttonEvent>HELD</buttonEvent>
-       <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-       <timeout_ms>15000</timeout_ms>
-    </message>
-
-    <message>
-        <messageName>APP_BUTTON_FACTORY_RESET</messageName>
-        <buttonEvent>HELD_RELEASE</buttonEvent>
-        <activePinFriendlyName>MFB_BUTTON</activePinFriendlyName>
-        <timeout_ms>15000</timeout_ms>
+        <timeout_ms>7000</timeout_ms>
     </message>
 
 </pio_message_map>

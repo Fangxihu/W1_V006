@@ -78,6 +78,8 @@ enum powerMessages
     POWER_SHUTDOWN_CANCELLED_IND,
 };
 
+extern void appPowerDoPowerOff(void);
+
 /*! \brief The client's response to #POWER_SHUTDOWN_PREPARE_IND.
            This informs power that the client is prepared to shutdown.
     \param task The client task.

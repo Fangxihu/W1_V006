@@ -42,16 +42,16 @@ static bool appAvApplyVolume(uint8 volume)
 
     if (appAvVolumeIsSet(volume))
     {
-        if (volume != theAv->volume)/*vol更新才会被设置*/
+        if (volume != theAv->volume)/*vol???????*/
         {
             /* Set local volume */
-            appAvSetLocalVolume(volume);/*最终是kymera那边设置gain值,打印来自这边*/
+            appAvSetLocalVolume(volume);/*???kymera????gain?,??????*/
             theAv->volume = volume;
 
             /* Cancel any pending messages */
             MessageCancelFirst(&theAv->task, AV_INTERNAL_VOLUME_STORE_REQ);
 
-            /* Store configuration after 5 seconds */ /*音量是和地址绑定存储的*/
+            /* Store configuration after 5 seconds */ /*???????????*/
             MessageSendLater(&theAv->task, AV_INTERNAL_VOLUME_STORE_REQ, 0, D_SEC(5));
         }
         return TRUE;
@@ -287,6 +287,7 @@ bool appAvVolumeRepeat(int16 step)
 {
     DEBUG_LOG("appAvVolumeRepeat~");
     /* Handle volume change locally */
+	appUiAvVolumeUp();
     if (appAvVolumeChange(step))
     {
         MAKE_AV_MESSAGE(AV_INTERNAL_VOLUME_REPEAT);
@@ -325,11 +326,13 @@ void appAvVolumeStart(int16 step)
     {
         if (appAvVolumeRepeat(step))
         {
+			DEBUG_LOG("UI_handle~");
             appGetAv()->volume_repeat = 0;
+			/*
             if (step > 0)
                 appUiAvVolumeUp();
             else
-                appUiAvVolumeDown();
+                appUiAvVolumeDown();*/
         }
     }
     else

@@ -114,6 +114,13 @@ const promptConfig prompt_config[] =
         .rate = 48000,
         .format = PROMPT_FORMAT_SBC,
     },
+#ifdef BATTERY_LOW
+    [PROMPT_BATTERY_LOW] = {
+        .filename = "BatteryLow16k.sbc",
+        .rate = 16000,
+        .format = PROMPT_FORMAT_SBC,
+    },
+#endif
 };
 
 /*! A prompt configuration must be defined for each prompt. */

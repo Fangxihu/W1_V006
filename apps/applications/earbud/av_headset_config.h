@@ -39,8 +39,37 @@ appHandleClDmLocalNameComplete*/
 /*断开的时候，自动配对的处理*/
 #define AUTO_PAIRIING
 
+ /*处理按键多击*/
+#define MULTI_TAP
 
-//SINGLE_PEER
+/*dut mode manager*/
+#define INCLUDE_DUT
+
+/*用于工厂需求的单耳测试*/
+#define INCLUDE_FTSINGLEPEER
+
+/*用于充电管控LED显示*/
+#define CHG_FINISH_LED
+
+/*对W1项目的LED管理*/
+#define W1_LED
+
+/*低电处理*/
+#define BATTERY_LOW
+
+/**/
+#define PEER_PAIRING_ALLOW_CONNECT
+
+/*单个使用处理*/
+#define SINGLE_PEER
+
+/*同时长按恢复出厂设置*/
+#define SYNC_FT_RESET
+
+/*主从切换自动播放*/
+#define PEER_SWTICH
+
+#define NAME_USER	FALSE
 
 /*==============================END==============================*/
 
@@ -114,14 +143,14 @@ appHandleClDmLocalNameComplete*/
 /*! Timeout in seconds for user initiated peer pairing */
 #define appConfigPeerPairingTimeout()       (120)
 /*! Timeout in seconds for user initiated handset pairing */
-#define appConfigHandsetPairingTimeout()    (20)
+#define appConfigHandsetPairingTimeout()    (120)
 /*! Timeout in seconds to disable page/inquiry scan after entering idle state */
 #define appConfigPairingScanDisableDelay()  (5)
 
 /*! Timeout in seconds for automatic peer pairing */
 #define appConfigAutoPeerPairingTimeout()       (0)
 /*! Timeout in seconds for automatic handset pairing */
-#define appConfigAutoHandsetPairingTimeout()    (30)
+#define appConfigAutoHandsetPairingTimeout()    (120)
 
 /*! Qualcomm Bluetooth SIG company ID */
 #define appConfigBtSigCompanyId() (0x00AU)
@@ -163,9 +192,9 @@ appHandleClDmLocalNameComplete*/
 /* The number of LEDs av_headset_led will control. */
 #define appConfigNumberOfLeds()  (2)
 /*! PIO to control LED0 */
-#define appConfigLed0Pio()       CHIP_LED_2_PIO
+#define appConfigLed0Pio()       CHIP_LED_0_PIO
 /*! PIO to control LED1 */
-#define appConfigLed1Pio()       CHIP_LED_0_PIO
+#define appConfigLed1Pio()       CHIP_LED_2_PIO
 /*! PIO to control LED2 */
 #define appConfigLed2Pio()       (0)
 
@@ -195,21 +224,21 @@ appHandleClDmLocalNameComplete*/
 #define appConfigInEarLedsEnabled() (TRUE)
 
 /*! Page timeout to use as left earbud attempting connection to the right Earbud. */
-#define appConfigLeftEarbudPageTimeout()    (0x1000)
+#define appConfigLeftEarbudPageTimeout()    (0x2000)//(0x1000)
 
 /*! Page timeout to use as right earbud attempting connection to the left Earbud. */
 #define appConfigRightEarbudPageTimeout()   (0x2000)
 
 /*! Page timeout to use for connecting to any non-peer Earbud devices. */
-#define appConfigDefaultPageTimeout()       (0x1000)
+#define appConfigDefaultPageTimeout()       (0x0EEE)//(0x1000)
 
 /*! The page timeout multiplier for Earbuds after link-loss.
     Multiplier should be chosen carefully to make sure total page timeout doesn't exceed 0xFFFF */
-#define appConfigEarbudLinkLossPageTimeoutMultiplier()  (3)
+#define appConfigEarbudLinkLossPageTimeoutMultiplier()  (6)//(3)
 
 /*! The page timeout multiplier for Handsets after link-loss.
     Multiplier should be chosen carefully to make sure total page timeout doesn't exceed 0xFFFF */
-#define appConfigHandsetLinkLossPageTimeoutMultiplier() (4)
+#define appConfigHandsetLinkLossPageTimeoutMultiplier() (12)//(4)
 
 /*! Inactivity timeout after which peer signalling channel will be disconnected, 0 to leave connected (in sniff) */
 #define appConfigPeerSignallingChannelTimeoutSecs()   (0)
@@ -229,7 +258,7 @@ appHandleClDmLocalNameComplete*/
 #define appConfigMaxVolumedB() (0)
 
 /*! Default volume gain in dB */
-#define appConfigDefaultVolumedB() (-10)
+#define appConfigDefaultVolumedB() (0)
 
 /*! The volume setting to use for no gain, when volume is specifed on range of 0-127 */
 #define appConfigVolumeNoGain127Step()  (127)
@@ -289,7 +318,7 @@ appHandleClDmLocalNameComplete*/
 #define appConfigChargerPreFastThresholdVoltage()      (3000)
 
 /*! Fast-charge current (mA) */
-#define appConfigChargerFastCurrent()                  (100)
+#define appConfigChargerFastCurrent()                  (50)
 
 /*! Fast-charge (constant voltage) to standby transition point.
     Percentage of the fast charge current */
@@ -322,9 +351,9 @@ appHandleClDmLocalNameComplete*/
 
 //!@{ @name Battery voltage levels in milli-volts
 #define appConfigBatteryFullyCharged()      (4200)
-#define appConfigBatteryVoltageOk()         (3600)
-#define appConfigBatteryVoltageLow()        (3300)
-#define appConfigBatteryVoltageCritical()   (3000)
+#define appConfigBatteryVoltageOk()         (3800)
+#define appConfigBatteryVoltageLow()        (3650)
+#define appConfigBatteryVoltageCritical()   (3300)
 //!@}
 
 //!@{ @name Battery temperature limits in degrees Celsius.
@@ -386,7 +415,7 @@ appHandleClDmLocalNameComplete*/
 
 /*! Only enable LED indications when Earbud is out of ear */
 #undef appConfigInEarLedsEnabled()
-#define appConfigInEarLedsEnabled() TRUE//(FALSE)
+#define appConfigInEarLedsEnabled() (TRUE)//(FALSE)
 
 #endif /* !defined(CF133) */
 
@@ -410,10 +439,10 @@ appHandleClDmLocalNameComplete*/
 
 /*! This timer is active in APP_STATE_OUT_OF_CASE_IDLE if set to a non-zero value.
     On timeout, the SM will allow sleep. */
-#define appConfigIdleTimeoutMs()   D_SEC(300)
+#define appConfigIdleTimeoutMs()   0//D_SEC(300)
 
 /*! Default DAC disconnection delay (in milliseconds) */
-#define appConfigDacDisconnectionDelayMs()    (60000)
+#define appConfigDacDisconnectionDelayMs()    500//(60000)
 
 /*! Microphone path delay variation. */
 #define appConfigMicPathDelayVariationUs()      (10000)

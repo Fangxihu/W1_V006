@@ -103,7 +103,7 @@ static void appPowerEnterDormantMode(bool extended_wakeup_events)
 
     It will return if curator refused to power-off due to charger detection ongoing.
 */
-static void appPowerDoPowerOff(void)
+void appPowerDoPowerOff(void)
 {
     /* No need to disable charger for power down, but if a charger is connected
        we will fail. This status should have been checked when the power off 
@@ -121,6 +121,11 @@ static void appPowerDoPowerOff(void)
 
     /* Fall back to Dormant */
     appPowerEnterDormantMode(FALSE);
+	
+#ifdef BATTERY_LOW
+	appBatteryCancelBatteryLow();
+	appUiUserBatteryLowCancel();
+#endif
 
     Panic();
 }
@@ -407,6 +412,8 @@ static void appPowerHandleInternalUIComplete(void)
 
 static void appPowerHandlePowerEvent(void)
 {
+    DEBUG_LOGF("appPowerHandlePowerEvent_state = %d",appGetPower()->state);
+
     switch (appGetPower()->state)
     {
         case POWER_STATE_INIT:
@@ -458,6 +465,7 @@ static void appPowerHandleMessage(Task task, MessageId id, Message message)
         case CHARGER_MESSAGE_DETACHED:
         case MESSAGE_BATTERY_LEVEL_UPDATE_STATE:
         case TEMPERATURE_STATE_CHANGED_IND:
+		DEBUG_LOG("appPowerHandleMessage");
             appPowerHandlePowerEvent();
             break;
         default:
@@ -663,4 +671,7 @@ void appPowerInit(void)
     {
         DEBUG_LOG("appPowerInit no temperature support");
     }
+#ifdef BATTERY_LOW
+	appBatteryLowCheck();
+#endif
 }

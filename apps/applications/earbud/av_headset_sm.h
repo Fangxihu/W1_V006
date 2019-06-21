@@ -286,17 +286,19 @@ extern bool appSmIsConnectable(void);
 
 #ifdef RECONNECT_HANDSET
 extern void appSmHandleReconnectHandset(void);
-#if 1
 extern bool appSmReconnectAndPairing(void);
 extern void appSmSetReconnectAndPairing(void);
 extern void appSmClearReconnectAndPairing(void);
-#endif
 extern void ReconnectSetState(reconnectState new_state);
 extern reconnectState ReconnectGetState(void);
 
 extern bool appSmRuleConnectUser(void);
 extern void appSmSetRuleConnectUser(bool value);
 
+#endif
+
+#ifdef INCLUDE_DUT
+extern void Dut_User_Exit_Peer_Pairing(void);
 #endif
 
 /* FUNCTIONS TO INITIATE AN ACTION IN THE SM
@@ -311,6 +313,15 @@ extern void appSmConnectHandset(void);
 extern void appSmFactoryReset(void);
 /*! \brief Reboot the earbud. */
 extern void appSmReboot(void);
+
+#ifdef CHG_FINISH_LED
+extern void UserDisconnectAllLinks(void);
+#endif
+#ifdef SINGLE_PEER
+extern void appSmSinglePeerConHandset(void);
+#endif
+
+extern void appSmDeletePairingAndReset(void);
 
 #ifdef INCLUDE_DFU
 /*! \brief Tell the state machine to enter DFU mode.
@@ -339,4 +350,7 @@ extern void appSmNotifyDfuActivity(void);
 
 #endif
 
+#endif
+#ifdef INCLUDE_DUT
+void Dut_User_Exit_Peer_Pairing(void);
 #endif

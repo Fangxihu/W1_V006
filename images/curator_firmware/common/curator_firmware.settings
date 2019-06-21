@@ -2,8 +2,8 @@
 <settings>
     <group name="kitres://{bbac163c-41be-4ce7-b236-236f15ff18ca}/prebuilt_image/default">
         <item name="Default">
-            <item name="deploy">device://trb/usb2trb/165388/qcc3020</item>
-            <item name="run">device://trb/usb2trb/165388/qcc3020</item>
+            <item name="deploy">device://tc/usb2tc/102/qcc3020</item>
+            <item name="run">device://tc/usb2tc/102/qcc3020</item>
         </item>
     </group>
 </settings>

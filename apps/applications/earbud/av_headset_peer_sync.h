@@ -78,6 +78,10 @@ typedef struct
 	bool peer_handset_reconnected:1; 		/*!< The peer has A2DP connected */
 	bool peer_handset_reconnecting:1;		/*!< The peer has A2DP connected */
 #endif
+#ifdef PEER_SWTICH
+    bool peer_switch_playing:1;        /*!< The peer earbud is performing DFU. */
+#endif
+
 } peerSyncTaskData;
 
 /*! Enumeration of messages which peer sync module can send. */
@@ -105,6 +109,12 @@ extern bool appPeerSyncIsPeerHandsetReconnecting(void);
 
 extern bool appPeerSyncIsPeerHandsetConnected(void);
 extern bool appPeerSyncUserPeerIsPairing(void);
+
+#ifdef PEER_SWTICH
+bool appPeerSyncPeerPlaying(void);
+void appPeerSyncPeerPlayingClear(void);
+void appPeerSyncPeerPlayingMark(void);
+#endif
 
 /*! \brief Send a peer sync to peer earbud.
     \param response [IN] TRUE if this is a response peer sync.

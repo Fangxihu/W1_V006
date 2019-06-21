@@ -807,11 +807,13 @@ static void ProcessOTAControlMessage(uint8 ota_msg_id, const uint8* payload, int
 
         case SFWD_OTA_MSG_INCOMING_CALL:
             DEBUG_LOG("SCO Forwarding notified of incoming call");
+			appUiHfpCallIncomingActive();
             theScoFwd->peer_incoming_call = TRUE;
             break;
 
         case SFWD_OTA_MSG_INCOMING_ENDED:
             DEBUG_LOG("SCO Forwarding notified of incoming call END");
+			appUiHfpCallIncomingInactive();
             theScoFwd->peer_incoming_call = FALSE;
             break;
 
@@ -886,7 +888,33 @@ static void ProcessOTAControlMessage(uint8 ota_msg_id, const uint8* payload, int
 			}
 			break;
 #endif
-			
+
+#ifdef SYNC_FT_RESET
+		case SFWD_OTA_MSG_FACTORY_RESET:
+			{
+				//SendOTAControlMessage(SFWD_OTA_MSG_FACTORY_RESET);
+				if(appConfigIsRight())
+				{
+					//if(appScoFwdSyncFactoryResetGet())
+					{
+						appSmFactoryReset();
+					}
+				}
+				else
+				{
+					if(appScoFwdSyncFactoryResetGet())
+					{
+						appScoFwdSyncFactoryResetSet(FALSE);
+					}
+					else
+					{
+						appScoFwdSyncFactoryResetSet(TRUE);
+					}
+				}
+			}
+			break;
+#endif
+
         default:
             DEBUG_LOG("Unhandled OTA");
             Panic();
@@ -1505,6 +1533,7 @@ static void appScoFwdKickProcessing(void)
    If the link is *not* already up, take steps to connect it */
 static void appScoFwdHandleLinkConnectReq(void)
 {
+    DEBUG_LOG("appScoFwdHandleLinkConnectReq");
     if (appScoFwdStateCanConnect())
         appScoFwdSetState(SFWD_STATE_SDP_SEARCH);
 }
@@ -2375,6 +2404,9 @@ void appScoFwdInit(void)
 
     /* Register for physical state changes */
     appPhyStateRegisterClient(appGetScoFwdTask());
+#ifdef SYNC_FT_RESET
+	appScoFwdSyncFactoryResetSet(FALSE);
+#endif
 }
 
 #endif /* INCLUDE_SCOFWD */
@@ -2488,3 +2520,28 @@ void appScoFwdHandleHfpAudioDisconnectIndication(const HFP_AUDIO_DISCONNECT_IND_
     appKymeraScoStop();
 }
 
+#ifdef SYNC_FT_RESET
+bool appScoFwdSyncFactoryResetGet(void)
+{
+    scoFwdTaskData *theScoFwd = appGetScoFwd();
+	DEBUG_LOG("appScoFwdSyncFactoryReset_Set!");
+    return theScoFwd->factory_reset;
+}
+
+void appScoFwdSyncFactoryResetSet(bool flag)
+{
+    scoFwdTaskData *theScoFwd = appGetScoFwd();
+	DEBUG_LOG("appScoFwdSyncFactoryReset_Set!");
+    theScoFwd->factory_reset = flag;
+}
+
+void appScoFwdSyncFactoryReset(void)
+{
+    scoFwdTaskData *theScoFwd = appGetScoFwd();
+	DEBUG_LOG("appScoFwdSyncFactoryReset!");
+
+    SendOTAControlMessage(SFWD_OTA_MSG_FACTORY_RESET);
+    theScoFwd->factory_reset = FALSE;
+}
+
+#endif					

@@ -256,6 +256,8 @@ void appScanManagerDisablePageScan(scanManagerUser user)
     scanning->page_scan_state &= ~user;
     scanning->page_user_params_type[user_params_index] = SCAN_MAN_PARAMS_TYPE_NOT_SET;
 
+    DEBUG_LOGF("scanning->page_scan_state %d", scanning->page_scan_state);
+
     /* if we still have active users, check remaining users requested params
      * against current params and see if we can modify current running params
      * to better satisfy remaining users */

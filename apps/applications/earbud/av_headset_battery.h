@@ -179,5 +179,9 @@ extern battery_level_state appBatteryGetState(void);
 #ifdef BATTERY_COMPENSATION
 extern uint8 appBatteryGetPercentHFP(void);
 #endif
+#ifdef BATTERY_LOW
+extern void appBatteryCancelBatteryLow(void);
+extern void appBatteryLowCheck(void);
 
+#endif
 #endif

@@ -450,8 +450,13 @@ static ruleAction rulePeerSync(void)
  */
 static ruleAction rulePeerSyncIfNotComplete(void)
 {
+	RULE_LOG("rulePeerSyncIfNotComplete");
+
     if (appPeerSyncIsComplete())
+	{
+        RULE_LOG("appPeerSyncIsComplete, COMPLETE");
         return RULE_ACTION_COMPLETE;
+	}
     else
         return rulePeerSync();
 }
@@ -852,6 +857,7 @@ static ruleAction ruleConnectHandset(ruleConnectReason reason)
 */
 static ruleAction ruleSyncConnectHandset(void)
 {
+    RULE_LOG("ruleSyncConnectHandset");
     return ruleConnectHandset(RULE_CONNECT_PEER_SYNC);
 }
 
@@ -1104,6 +1110,7 @@ static ruleAction ruleConnectPeerHandset(ruleConnectReason reason)
 */
 static ruleAction ruleSyncConnectPeerHandset(void)
 {
+    RULE_LOG("ruleSyncConnectPeerHandset");
     return ruleConnectPeerHandset(RULE_CONNECT_PEER_SYNC);
 }
 

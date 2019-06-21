@@ -81,7 +81,7 @@ static void appSmCancelDfuTimers(void)
 }
 
 /*! \brief Delete all peer and handset pairing and reboot device. */
-static void appSmDeletePairingAndReset(void)
+void appSmDeletePairingAndReset(void)
 {
     bdaddr bd_addr;
 
@@ -134,6 +134,27 @@ static bool appSmDisconnectAllLinks(void)
     return all_links_disconnected;
 }
 
+#ifdef CHG_FINISH_LED
+
+void UserDisconnectAllLinks(void)
+{
+    if (appDeviceIsHandsetHfpConnected())
+    {
+        DEBUG_LOG("appSmDisconnectAllLinks HANDSET HFP IS CONNECTED");
+        appHfpDisconnectInternal();
+    }
+    if (appDeviceIsHandsetA2dpConnected() || appDeviceIsHandsetAvrcpConnected())
+    {
+        DEBUG_LOG("appSmDisconnectAllLinks HANDSET AV IS CONNECTED");
+        appAvDisconnectHandset();
+    }
+	
+#ifdef	RECONNECT_AND_PAIRING
+	appPairingHandsetPairCancel();
+	appScanManagerDisableInquiryPageScan(SCAN_MAN_USER_PAIRING);
+#endif
+}
+#endif
 
 /*! \brief Determine which state to transition to based on physical state.
     \return appState One of the states that correspond to a physical earbud state.
@@ -551,6 +572,11 @@ static void appEnterInCase(void)
 
     /* request handset signalling module send current state to handset. */
     appHandsetSigSendEarbudStateReq(PHY_STATE_IN_CASE);
+	
+#ifdef PEER_SWTICH
+		if(appPeerSyncIsPeerInCase())
+			appPeerSyncPeerPlayingClear();
+#endif
 
 #ifdef RECONNECT_HANDSET
 	//appScoFwdClearReconnectFlag();
@@ -1285,7 +1311,7 @@ static void appSmHandleConnRulesConnectPeer(const CONN_RULES_CONNECT_PEER_T* crc
     appConnRulesSetRuleComplete(CONN_RULES_CONNECT_PEER);
 }
 
-
+/*Master switch Slave*/
 /*! \brief Connect HFP, A2DP and AVRCP to peer's connected handset. */
 static void appSmHandleConnRulesConnectPeerHandset(CONN_RULES_CONNECT_PEER_HANDSET_T* crcph)
 {
@@ -1861,7 +1887,7 @@ static void appSmHandleHfpScoDisconnectedInd(void)
 
 static void appSmHandleInternalPairHandset(void)
 {
-    if ((appSmStateIsIdle(appGetState()) && (!appPeerSyncUserPeerIsPairing())) || (appSmReconnectAndPairing()))
+    if ((appSmStateIsIdle(appGetState()) && (!appPeerSyncUserPeerIsPairing())) || (appSmReconnectAndPairing()) || (appUiFTSingleGet()))
     {
         appSmSetUserPairing();
         appSetState(APP_STATE_HANDSET_PAIRING);
@@ -1903,7 +1929,7 @@ static void appSmHandleInternalDeleteHandsets(void)
 /*! \brief Handle request to start factory reset. */
 static void appSmHandleInternalFactoryReset(void)
 {
-    if (appSmStateIsIdle(appGetState()))
+    if (appSmStateIsIdle(appGetState()) || (APP_SUBSTATE_HANDSET_PAIRING == appGetState()))
         appSetState(APP_STATE_FACTORY_RESET);
     else
         DEBUG_LOG("appSmHandleInternalFactoryReset can only factory reset in IDLE state");
@@ -1945,6 +1971,7 @@ static void appSmHandleEnterDfuWithTimeout(uint32 timeout)
 static void appSmHandleDfuEnded(bool error)
 {
     DEBUG_LOGF("appSmHandleDfuEnded(%d)",error);
+	appUiDfuActiveCancel();
 
     if (appGetState() == APP_STATE_IN_CASE_DFU)
     {
@@ -2622,5 +2649,50 @@ static void appSmHandleAutoPairing(const bdaddr *bd_addr)
 }
 
 #endif
+
+#ifdef INCLUDE_DUT
+void Dut_User_Exit_Peer_Pairing(void)
+{
+	appState Current_state = appGetSm()->state;
+	DEBUG_LOGF("Dut_User_Exit_Peer_Pairing!!!,state=%x", Current_state);
+
+	if((Current_state == APP_STATE_STARTUP) || (Current_state == APP_STATE_PEER_PAIRING))
+	{
+		DEBUG_LOG("enter!!!");
+		appConnRulesResetEvent(RULE_EVENT_STARTUP);
+		appPairingPeerPairCancel();
+
+		conManagerTaskData *theConMgr = appGetConManager();
+		theConMgr->handset_connect_allowed = TRUE;
+		appSetState(APP_STATE_OUT_OF_CASE_IDLE);
+
+		if(appUiFTSingleGet())	{
+			appPairingInit();
+			MessageSendLater(appGetSmTask(), SM_INTERNAL_PAIR_HANDSET, NULL, 300);
+		}
+		else	{
+			appSetState(APP_STATE_HANDSET_PAIRING);
+		}
+	}
+}
+#endif
+
+#ifdef SINGLE_PEER
+void appSmSinglePeerConHandset(void)
+{
+    /*appConnRulesSetEvent(appGetSmTask(), RULE_EVENT_USER_SINGLE_RECON);*/
+	/*appConManagerAllowHandsetConnect(TRUE);*/
+	//appSmSetSinglePeer();
+	
+	DEBUG_LOG("appSmSinglePeerConHandset___");
+	/* Connect HFP to handset */
+	appHfpConnectHandset();
+
+	/* Connect AVRCP and A2DP to handset */
+	appAvConnectHandset();
+}
+
+#endif
+
 
 

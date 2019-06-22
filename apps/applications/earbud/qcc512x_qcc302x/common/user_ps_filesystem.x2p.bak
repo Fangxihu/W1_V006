@@ -12,12 +12,12 @@
             <property name="TYPE">user_ps</property>
             <property name="system_label">QCC512X_CONFIG</property>
         </configuration>
-        <configuration name="filesystem" kit="kitres://{72f9104a-225e-4fe9-a320-666c9faf24a6}" options="build|deploy|default">
+        <configuration name="filesystem" kit="kitres://{2d6c5c72-978a-49f9-b1d3-44fd40bb227f}" options="build|deploy|default">
             <devkitConfiguration>filesystem</devkitConfiguration>
-            <devkitPath>E:/qtil/ADK_QCC512X_QCC302X_WIN_6.3.2.36</devkitPath>
+            <devkitPath>E:/qtil/ADK_QCC512X_QCC302X_WIN_6.4.0.34</devkitPath>
             <devkitGroup>kitres://{bbac163c-41be-4ce7-b236-236f15ff18ca}</devkitGroup>
             <deployProject>deploy</deployProject>
-            <devkitRevision>1557218675</devkitRevision>
+            <devkitRevision>1560974054</devkitRevision>
             <property name="TYPE">user_ps</property>
             <property name="system_label">QCC512X_CONFIG</property>
         </configuration>

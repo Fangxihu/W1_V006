@@ -24,6 +24,7 @@
         <file path="../../av_headset_kymera.c"/>
         <file path="../../av_headset_kymera_a2dp.c"/>
         <file path="../../av_headset_kymera_common.c"/>
+        <file path="../../av_headset_kymera_mic_spk.c"/>
         <file path="../../av_headset_kymera_sco.c"/>
         <file path="../../av_headset_kymera_tones_prompts.c"/>
         <file path="../../av_headset_led.c"/>
@@ -60,6 +61,7 @@
         <file path="../../chains/chain_forwarding_input_aptx_right.chain"/>
         <file path="../../chains/chain_forwarding_input_sbc_left.chain"/>
         <file path="../../chains/chain_forwarding_input_sbc_right.chain"/>
+        <file path="../../chains/chain_loopback.chain"/>
         <file path="../../chains/chain_micfwd_nb.chain"/>
         <file path="../../chains/chain_micfwd_nb_2mic.chain"/>
         <file path="../../chains/chain_micfwd_send.chain"/>
@@ -146,7 +148,7 @@
             <property name="CHIP_TYPE">qcc512x_qcc302x</property>
             <property name="DBG_CORE">app/p1</property>
             <property name="DEFAULT_LIBS">usb_early_init</property>
-            <property name="DEFS">AV_DEBUG BLUELAB DEBUG HAVE_1_BUTTON HAVE_2_LEDS HAVE_32BIT_DATA_WIDTH HAVE_THERMISTORx HYDRA HYDRACORE INCLUDE_AV INCLUDE_CHARGER INCLUDE_DFU INCLUDE_GATT INCLUDE_HFP INCLUDE_MICFWD INCLUDE_PROMPTS INCLUDE_SCOFWD INCLUDE_TEMPERATUREx INCLUDE_TONES INSTALL_HYDRA_LOG QCC3020_AA_DEV_BRD_R2_AA THERMISTOR_ADC=adcsel_led5 THERMISTOR_DATA_FILE=thermistor_lp4549652p3m.h THERMISTOR_ON=THERMISTOR_PIO_UNUSED USE_BDADDR_FOR_LEFT_RIGHT __KALIMBA__</property>
+            <property name="DEFS">AV_DEBUG BLUELAB DEBUG HAVE_1_BUTTON HAVE_2_LEDS HAVE_32BIT_DATA_WIDTH HAVE_THERMISTORx HYDRA HYDRACORE INCLUDE_AV INCLUDE_CHARGER INCLUDE_DFU INCLUDE_GATT INCLUDE_HFP INCLUDE_MICFWD INCLUDE_PROMPTS INCLUDE_SCOFWD INCLUDE_TEMPERATUREx INCLUDE_TONES INSTALL_HYDRA_LOG QCC3020_AA_DEV_BRD_R2_AA THERMISTOR_ADC=adcsel_led5 THERMISTOR_DATA_FILE=thermistor_lp4549652p3m.h THERMISTOR_ON=THERMISTOR_PIO_UNUSED USE_BDADDR_FOR_LEFT_RIGHT __KALIMBA__ disCHAIN_MIC_SPK</property>
             <property name="EXTRA_WARNINGS">FALSE</property>
             <property name="FLASH_CONFIG">..\..\32Mbit_default_flash_config.py</property>
             <property name="HW_VARIANT">QCC3020-AA_DEV-BRD-R2-AA</property>

@@ -415,6 +415,16 @@ void appKymeraHandleInternalScoForwardingStopRx(void);
 #define appKymeraHandleInternalScoStopForwardingTx() TRUE
 #endif
 
+#ifdef CHAIN_MIC_SPK
+uint8 mic_spk_flag;
+/*! Get current state */
+#define appKymeraGetState() (appGetKymera()->state)
+
+extern void appKymerStartLoopback(void); //xw
+extern void appKymerLoopbackStart(void);
+extern void appKymerLoopbackStop(void);
+#endif
+
 #ifdef INCLUDE_MICFWD
 /*! \brief Switch the microphone source to transmit to the AG. */
 void appKymeraSwitchSelectMic(micSelection mic);

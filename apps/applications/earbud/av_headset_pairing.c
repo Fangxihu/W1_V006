@@ -1521,7 +1521,7 @@ static void appHandleClDmLocalNameComplete(CL_DM_LOCAL_NAME_COMPLETE_T *msg)
 	}
 #endif
 	if(appUiFTSingleGet() || (NAME_USER))	{
-        uint8 local_name[] = "W1-V28-R";
+        uint8 local_name[] = "W1-V29-R";
 		uint16 size_local_name = sizeof(local_name);
 		DEBUG_LOGF("size_local_name %d", size_local_name);
 

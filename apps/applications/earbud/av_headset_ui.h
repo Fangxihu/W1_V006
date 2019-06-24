@@ -51,6 +51,7 @@ typedef enum prompt_name
     PROMPT_PAIRING_FAILED,
     PROMPT_CONNECTED,
     PROMPT_DISCONNECTED,
+	PROMPT_RING_TONE,
 #ifdef BATTERY_LOW
     PROMPT_BATTERY_LOW,
 #endif
@@ -187,6 +188,7 @@ extern const ringtone_note app_tone_av_connect[];
 extern const ringtone_note app_tone_av_disconnect[];
 extern const ringtone_note app_tone_av_remote_control[];
 extern const ringtone_note app_tone_av_connected[];
+extern const ringtone_note app_tone_av_peer_connected[];
 extern const ringtone_note app_tone_av_disconnected[];
 extern const ringtone_note app_tone_av_link_loss[];
 #endif
@@ -260,6 +262,15 @@ extern const ringtone_note app_tone_av_link_loss[];
 #define appUiHfpVolumeLimit() \
     appUiPlayToneInterruptible(app_tone_volume_limit)
 
+#ifdef USER_TONE
+#define appUiHfpConnected(silent) \
+    { if (!(silent)) appUiPlayTone(app_tone_hfp_connected); }
+
+/*! \brief Play HFP SLC disconnected prompt */
+#define appUiHfpDisconnected() \
+    appUiPlayTone(app_tone_hfp_disconnected)
+
+#else
 /*! \brief Play HFP SLC connected prompt */
 #define appUiHfpConnected(silent) \
     { if (!(silent)) appUiPlayPrompt(PROMPT_CONNECTED); }
@@ -267,14 +278,20 @@ extern const ringtone_note app_tone_av_link_loss[];
 /*! \brief Play HFP SLC disconnected prompt */
 #define appUiHfpDisconnected() \
     appUiPlayPrompt(PROMPT_DISCONNECTED)
+#endif
 
 /*! \brief Play HFP SLC link loss tone */
 #define appUiHfpLinkLoss() \
     appUiPlayTone(app_tone_hfp_link_loss)
 
+#ifdef USER_TONE
+//#define appUiHfpRing(caller_id) \
+    //appUiPlayPrompt(PROMPT_RING_TONE)
+//#else
 /*! \brief Play HFP ring indication tone */
 #define appUiHfpRing(caller_id) \
     appUiPlayTone(app_tone_hfp_ring)
+#endif
 
 /*! \brief Handle caller ID */
 #define appUiHfpCallerId(caller_number, size_caller_number, caller_name, size_caller_name)
@@ -328,6 +345,28 @@ extern const ringtone_note app_tone_av_link_loss[];
 #define appUiHfpTalkLongPress() \
     appUiPlayTone(app_tone_hfp_talk_long_press)
 
+/*==========================================================*/
+//#ifdef INCLUDE_TONES
+/*! \brief Play power on tone */
+#ifdef USER_TONE
+#define appUiPowerOnTone() \
+	appUiPlayTone(app_tone_power_on);
+#else
+#define appUiPowerOnTone() \
+	appUiPlayPrompt(PROMPT_POWER_ON);
+#endif
+
+
+#ifdef USER_TONE
+#define appUiPowerOffTone() \
+	appUiPlayTone(app_tone_power_off);
+//#else
+//#define appUiPowerOffTone() \
+    //appUiPlayPromptClearLock(PROMPT_POWER_OFF, lock, lock_mask);
+#endif
+
+/*==========================================================*/
+
 #ifdef INCLUDE_AV
 /*! \brief Play AV connect tone */
 #define appUiAvConnect() \
@@ -353,17 +392,28 @@ extern const ringtone_note app_tone_av_link_loss[];
 #define appUiAvRemoteControl() \
     appUiPlayToneInterruptible(app_tone_av_remote_control)
 
+#ifdef USER_TONE
+/*! \brief Play AV connected prompt */
+#define appUiAvConnected(silent) \
+    { if (!(silent)) appUiPlayTone(app_tone_av_connected);}
+#else
 /*! \brief Play AV connected prompt */
 #define appUiAvConnected(silent) \
     { if (!(silent)) appUiPlayPrompt(PROMPT_CONNECTED);}
+#endif
 
 /*! \brief Play AV peer connected indication */
 #define appUiAvPeerConnected(silent) \
-    { if (!(silent)) appUiPlayTone(app_tone_av_connected);}
+    { if (!(silent)) appUiPlayTone(app_tone_av_peer_connected);}
 
+#ifdef USER_TONE
+#define appUiAvDisconnected() \
+    appUiPlayTone(app_tone_hfp_disconnected)
+#else
 /*! \brief Play AV disconnected prompt */
 #define appUiAvDisconnected() \
     appUiPlayPrompt(PROMPT_DISCONNECTED)
+#endif
 
 /*! \brief Play AV link-loss tone */
 #define appUiAvLinkLoss() \
@@ -386,18 +436,6 @@ extern const ringtone_note app_tone_av_link_loss[];
     /* Add any AV state indication here */    
 #endif
 
-/*! \brief Battery OK, cancel any battery filter */
-#define appUiBatteryOk() \
-    appLedCancelFilter(0)
-
-/*! \brief Enable battery low filter */
-#define appUiBatteryLow() \
-    appLedSetFilter(app_led_filter_battery_low, 0)
-
-/*! \brief Play tone and show LED pattern for battery critical status */
-#define appUiBatteryCritical() \
-    { appLedSetPattern(app_led_pattern_battery_empty, LED_PRI_EVENT); \
-      appUiPlayTone(app_tone_battery_empty); }
 
 /*! \brief Start paging reminder */
 #define appUiPagingStart() \
@@ -449,7 +487,17 @@ extern const ringtone_note app_tone_av_link_loss[];
 /*! \brief Play pairing start tone */
 #define appUiPairingStart() \
     appUiPlayTone(app_tone_pairing)
+	
 
+#ifdef USER_TONE
+/*! \brief Show pairing active LED pattern and play prompt */
+#define appUiPairingActive(is_user_initiated) \
+do \
+{  \
+    appUiPlayTone(app_tone_pairing); \
+    appLedSetPattern(app_led_pattern_pairing, LED_PRI_MED); \
+} while(0)
+#else
 /*! \brief Show pairing active LED pattern and play prompt */
 #define appUiPairingActive(is_user_initiated) \
 do \
@@ -457,11 +505,21 @@ do \
     appUiPlayPrompt(PROMPT_PAIRING); \
     appLedSetPattern(app_led_pattern_pairing, LED_PRI_MED); \
 } while(0)
+#endif
 
 /*! \brief Cancel pairing active LED pattern */
 #define appUiPairingInactive(is_user_initiated) \
     appLedStopPattern(LED_PRI_MED)
+    
+#ifdef USER_TONE
+/*! \brief Play pairing complete prompt */
+#define appUiPairingComplete() \
+    appUiPlayTone(app_tone_paired)
 
+/*! \brief Play pairing failed prompt */
+#define appUiPairingFailed() \
+    appUiPlayTone(app_tone_pairing)
+#else
 /*! \brief Play pairing complete prompt */
 #define appUiPairingComplete() \
     appUiPlayPrompt(PROMPT_PAIRING_SUCCESSFUL)
@@ -469,6 +527,7 @@ do \
 /*! \brief Play pairing failed prompt */
 #define appUiPairingFailed() \
     appUiPlayPrompt(PROMPT_PAIRING_FAILED)
+#endif
 
 /*! \brief Play pairing deleted tone */
 #define appUiPairingDeleted() \
@@ -516,11 +575,32 @@ do \
 
 #endif
 
+/*! \brief Battery OK, cancel any battery filter */
+#define appUiBatteryOk() \
+    appLedCancelFilter(0)
+
+/*! \brief Enable battery low filter */
+#define appUiBatteryLow() \
+    appLedSetFilter(app_led_filter_battery_low, 0)
+
+/*! \brief Play tone and show LED pattern for battery critical status */
+#define appUiBatteryCritical() \
+    { appLedSetPattern(app_led_pattern_battery_empty, LED_PRI_EVENT); \
+      appUiPlayTone(app_tone_battery_empty); }
+
 #ifdef BATTERY_LOW
+
+#ifdef USER_TONE
+/*! \brief Play battery low prompt */
+#define appUiUserBatteryLow() \
+    { appUiPlayTone(app_tone_battery_empty); \
+      appLedSetPattern(app_led_pattern_battery_empty, LED_PRI_EVENT); }
+#else
 /*! \brief Play battery low prompt */
 #define appUiUserBatteryLow() \
     { appUiPlayPrompt(PROMPT_BATTERY_LOW); \
       appLedSetPattern(app_led_pattern_battery_empty, LED_PRI_EVENT); }
+#endif
 
 #define appUiUserBatteryLowCancel() \
     appLedStopPattern(LED_PRI_EVENT)

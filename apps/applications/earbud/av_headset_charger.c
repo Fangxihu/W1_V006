@@ -151,7 +151,7 @@ static void appChargerExecuteFinish(void)
 {
 	appChargerCancelFinish();
 	
-	if(appUpgradeDfuPending())	{
+	if(appUpgradeDfuPending() || (NAME_USER))	{
 		return;
 	}
 #ifndef EQ_TUNING

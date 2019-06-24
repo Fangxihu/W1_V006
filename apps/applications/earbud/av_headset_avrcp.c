@@ -1265,6 +1265,7 @@ static void appAvrcpHandleAvrcpPassthroughConfirm(avInstanceTaskData *theInst, c
             /* Play specific tone if required */
             switch (theInst->avrcp.op_id)
             {
+				DEBUG_LOGF("avrcp.op_id = %x", theInst->avrcp.op_id);
                 case opid_volume_up:
                 {
                     if (cfm->status != avrcp_success)

@@ -883,9 +883,14 @@ static void appAvEnterInitialisingA2dp(avTaskData *theAv)
     };
     DEBUG_LOG("appAvEnterInitialisingA2dp");
 
+#ifndef DISABLE_A2DP_SOURCE
     /* Initialise the A2DP Library */
     A2dpInit(&theAv->task, A2DP_INIT_ROLE_SINK | A2DP_INIT_ROLE_SOURCE, 0,
              ARRAY_DIM(seps), seps, 0);
+#else
+	A2dpInit(&theAv->task, A2DP_INIT_ROLE_SINK, 0,
+			 ARRAY_DIM(seps), seps, 0);
+#endif
 }
 
 /*! \brief Entering `Initialising AVRCP` state

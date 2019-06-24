@@ -18,6 +18,7 @@
 #include "av_headset_hfp.h"
 #include "av_headset_power.h"
 #include "av_headset_log.h"
+#include "av_headset_kymera_private.h"
 
 /*! Include the correct button header based on the number of buttons available to the UI */
 #if defined(HAVE_9_BUTTONS)
@@ -44,6 +45,10 @@ enum ui_internal_messages
 #endif
 
 };
+
+#ifdef CHAIN_MIC_SPK
+extern uint8 mic_spk_flag=0;
+#endif
 
 /*! At the end of every tone, add a short rest to make sure tone mxing in the DSP doens't truncate the tone */
 #define RINGTONE_STOP  RINGTONE_NOTE(REST, HEMIDEMISEMIQUAVER), RINGTONE_END
@@ -442,6 +447,7 @@ const ringtone_note app_tone_button_factory_reset[] =
     RINGTONE_NOTE(B7, SEMIQUAVER),
     RINGTONE_STOP
 };
+	
 
 #ifdef INCLUDE_AV
 const ringtone_note app_tone_av_connect[] =
@@ -454,7 +460,11 @@ const ringtone_note app_tone_av_connect[] =
 const ringtone_note app_tone_av_disconnect[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
+#ifdef USER_TONE
+	RINGTONE_NOTE(G5,  SEMIQUAVER),
+#else
     RINGTONE_NOTE(D7, SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
 
@@ -465,13 +475,21 @@ const ringtone_note app_tone_av_remote_control[] =
     RINGTONE_STOP
 };
 
-const ringtone_note app_tone_av_connected[] =
+const ringtone_note app_tone_av_peer_connected[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
     RINGTONE_NOTE(D6,  SEMIQUAVER),
     RINGTONE_NOTE(A6,  SEMIQUAVER),
     RINGTONE_STOP
 };
+
+const ringtone_note app_tone_av_connected[] =
+{
+    RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
+    RINGTONE_NOTE(G6,  SEMIQUAVER),
+    RINGTONE_STOP
+};
+
 
 const ringtone_note app_tone_av_disconnected[] =
 {
@@ -501,25 +519,38 @@ const ringtone_note app_tone_hfp_connect[] =
 const ringtone_note app_tone_hfp_connected[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
+#ifdef USER_TONE
+	RINGTONE_NOTE(GS7,  SEMIQUAVER),
+#else
     RINGTONE_NOTE(D6,  SEMIQUAVER),
     RINGTONE_NOTE(A6,  SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
 
 const ringtone_note app_tone_hfp_disconnected[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
+#ifdef USER_TONE
+	RINGTONE_NOTE(G5,  CROTCHET_TRIPLET ),
+#else
     RINGTONE_NOTE(A6,  SEMIQUAVER),
     RINGTONE_NOTE(D6,  SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
 
 const ringtone_note app_tone_hfp_link_loss[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
+#ifdef USER_TONE
+	RINGTONE_NOTE(G5,  SEMIQUAVER),
+    RINGTONE_NOTE(G5,  SEMIQUAVER),
+#else
     RINGTONE_NOTE(A5,  SEMIQUAVER),
     RINGTONE_NOTE(D5,  SEMIQUAVER),
     RINGTONE_NOTE(D5,  SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
         
@@ -631,15 +662,24 @@ const ringtone_note app_tone_hfp_talk_long_press[] =
 const ringtone_note app_tone_pairing[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
-    RINGTONE_NOTE(D7, SEMIQUAVER),
+#ifdef USER_TONE
+	RINGTONE_NOTE(E6, SEMIQUAVER),
+	RINGTONE_NOTE(A6, SEMIQUAVER),
+#else
+	RINGTONE_NOTE(D7, SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
 
 const ringtone_note app_tone_paired[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
-    RINGTONE_NOTE(A6, SEMIQUAVER),
-    RINGTONE_NOTE(D7, SEMIQUAVER),
+#ifdef USER_TONE
+	RINGTONE_NOTE(C6, SEMIQUAVER),
+#else
+	RINGTONE_NOTE(A6, SEMIQUAVER),
+	RINGTONE_NOTE(D7, SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
 
@@ -677,27 +717,49 @@ const ringtone_note app_tone_error[] =
 
 const ringtone_note app_tone_battery_empty[] =
 {
-    RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
+    RINGTONE_TIMBRE(sine), RINGTONE_DECAY(48),
+#ifdef BATTERY_LOW
+    RINGTONE_NOTE(E6, DEMISEMIQUAVER),
+    RINGTONE_NOTE(AS6, DEMISEMIQUAVER),
+    RINGTONE_NOTE(E6, DEMISEMIQUAVER),
+    RINGTONE_NOTE(AS6, DEMISEMIQUAVER),
+    RINGTONE_NOTE(E6, DEMISEMIQUAVER),
+#else
     RINGTONE_NOTE(B6, SEMIQUAVER),
     RINGTONE_NOTE(B6, SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
 
 const ringtone_note app_tone_power_on[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
+#ifdef USER_TONE
+	RINGTONE_NOTE(GS4, SEMIQUAVER_TRIPLET),
+	RINGTONE_NOTE(DS5,	SEMIQUAVER_TRIPLET),
+	RINGTONE_NOTE(GS5,	SEMIQUAVER_TRIPLET),
+	RINGTONE_NOTE(C6,  SEMIQUAVER_TRIPLET),
+#else
     RINGTONE_NOTE(CS5, SEMIQUAVER),
     RINGTONE_NOTE(D5,  SEMIQUAVER),
     RINGTONE_NOTE(A5,  SEMIQUAVER),
-    RINGTONE_STOP
+#endif
+	RINGTONE_STOP
 };
 
 const ringtone_note app_tone_power_off[] =
 {
     RINGTONE_TIMBRE(sine), RINGTONE_DECAY(16),
-    RINGTONE_NOTE(A5,  SEMIQUAVER),
-    RINGTONE_NOTE(D5,  SEMIQUAVER),
-    RINGTONE_NOTE(CS5, SEMIQUAVER),
+#ifdef USER_TONE
+	RINGTONE_NOTE(C6, SEMIQUAVER_TRIPLET),
+	RINGTONE_NOTE(GS5,	SEMIQUAVER_TRIPLET),
+	RINGTONE_NOTE(DS5,	SEMIQUAVER_TRIPLET),
+	RINGTONE_NOTE(GS4,	SEMIQUAVER_TRIPLET),
+#else
+	RINGTONE_NOTE(A5,  SEMIQUAVER),
+	RINGTONE_NOTE(D5,  SEMIQUAVER),
+	RINGTONE_NOTE(CS5, SEMIQUAVER),
+#endif
     RINGTONE_STOP
 };
 
@@ -870,7 +932,8 @@ void appUiPowerOn(void)
     appLedEnable(TRUE);
     
     appLedSetPattern(app_led_pattern_power_on, LED_PRI_EVENT);
-    appUiPlayPrompt(PROMPT_POWER_ON);
+    //appUiPlayPrompt(PROMPT_POWER_ON);
+    appUiPowerOnTone();
 }
 
 /*! \brief Play power off prompt and LED pattern.
@@ -879,8 +942,17 @@ void appUiPowerOn(void)
  */
 void appUiPowerOff(uint16 *lock, uint16 lock_mask)
 {
+#ifdef USER_TONE
+	UNUSED(lock);
+	UNUSED(lock_mask);
+#endif
+
     appLedSetPattern(app_led_pattern_power_off, LED_PRI_EVENT);
+#ifdef USER_TONE
+	appUiPowerOffTone();
+#else
     appUiPlayPromptClearLock(PROMPT_POWER_OFF, lock, lock_mask);
+#endif
 
     /* Disable LEDs */
     appLedEnable(FALSE);
@@ -1003,7 +1075,29 @@ static void appUiMultiTapHandle(void)
 #endif
 			if (appSmIsOutOfCase())
 			{
-				appHfpCallVoice();
+				if(appConfigIsLeft())
+				{
+#ifdef CHAIN_MIC_SPK
+					if (appGetSm()->state == APP_STATE_IN_EAR_IDLE)
+					{
+						if (!mic_spk_flag)
+						{
+						appKymerLoopbackStart();
+						mic_spk_flag = 1;
+						}
+						else
+						{
+						appKymerLoopbackStop();
+						mic_spk_flag = 0;
+						}
+					 }
+#endif
+				}
+				else
+				{
+					appHfpCallVoice();
+				}
+
 			}
 		}
 		break;
@@ -1011,12 +1105,13 @@ static void appUiMultiTapHandle(void)
 		case 4:
 		{
 			DEBUG_LOG("key four!!!_forward");
-#ifdef EQ_TUNING
-			if (appSmIsOutOfCase())
-				appTestPhyStateInCaseEvent();
-			else if (appSmIsInCase())
-				appTestPhyStateOutOfCaseEvent();
-#endif
+			if(NAME_USER)
+			{
+				if (appSmIsOutOfCase())
+					appTestPhyStateInCaseEvent();
+				else if (appSmIsInCase())
+					appTestPhyStateOutOfCaseEvent();
+			}
 		}
 		break;
 		

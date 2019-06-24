@@ -69,7 +69,9 @@ typedef struct
     kymera_chain_handle_t chain_input_handle;
     /*! The tone chain is used when a tone is played. */
     kymera_chain_handle_t chain_tone_handle;
-
+#ifdef CHAIN_MIC_SPK
+	kymera_chain_handle_t loopback_handle;
+#endif
     /*! The output_vol_handle/sco_handle chain are used mutually exclusively.
         The output_vol_handle/sco_handle both contain OPR_SOURCE_SYNC/OPR_VOLUME_CONTROL.
         These chains are unioned to simplify volume control code: output_vol_handle

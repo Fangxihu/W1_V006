@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Copyright (c) 2018 Qualcomm Technologies International, Ltd.-->
+<!--Chain for loopback -->
+
+<chain name="CHAIN_LOOPBACK" id="0" generate_operator_roles_enum="False" generate_endpoint_roles_enum="False">
+
+    <include_header name="../av_headset_chain_roles.h"/>
+
+    <operator name="OPR_LATENCY_BUFFER" id="CAP_ID_BASIC_PASS">
+        <sink name="IN" terminal="0"/>
+        <source name="OUT" terminal="0"/>
+    </operator>
+
+    <operator name="OPR_VOLUME_CONTROL" id="CAP_ID_VOL_CTRL_VOL">
+        <sink name="IN" terminal="0"/>
+        <source name="OUT" terminal="0"/>
+    </operator>
+
+
+    <input sink="OPR_LATENCY_BUFFER.IN" role="EPR_SCO_MIC1"/>
+    <output source="OPR_VOLUME_CONTROL.OUT" role="EPR_SOURCE_MIXER_OUT"/>
+
+    <connection source="OPR_LATENCY_BUFFER.OUT" sink="OPR_VOLUME_CONTROL.IN"/>
+
+</chain>
+

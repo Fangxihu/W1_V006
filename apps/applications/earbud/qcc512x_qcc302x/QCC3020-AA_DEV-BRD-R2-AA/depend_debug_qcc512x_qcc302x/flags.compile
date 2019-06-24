@@ -39,6 +39,7 @@
 -DTHERMISTOR_ON=THERMISTOR_PIO_UNUSED
 -DUSE_BDADDR_FOR_LEFT_RIGHT
 -D__KALIMBA__
+-DdisCHAIN_MIC_SPK
 -preinclude
 hydra_types.h
 -preinclude

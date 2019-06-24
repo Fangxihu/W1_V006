@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <project name="customer_ro_filesystem" path="" locked="no">
+    <file path="../../prompts/BatteryLow16k.sbc"/>
     <file path="../../prompts/connected.sbc"/>
     <file path="../../prompts/disconnected.sbc"/>
     <file path="../../prompts/pairing.sbc"/>
@@ -7,6 +8,7 @@
     <file path="../../prompts/pairing_successful.sbc"/>
     <file path="../../prompts/power_off.sbc"/>
     <file path="../../prompts/power_on.sbc"/>
+    <file path="../../prompts/ring_tone.wav"/>
     <file path="../../../../../audio/kalimba_ROM_4786/kymera/prebuilt_dkcs/stre_rom_v02_release/download_aec_reference.edkcs"/>
     <file path="../../../../../audio/kalimba_ROM_4786/kymera/prebuilt_dkcs/stre_rom_v02_release/download_aptx_demux.edkcs"/>
     <file path="../../../../../audio/kalimba_ROM_4786/kymera/prebuilt_dkcs/stre_rom_v02_release/download_async_wbs.edkcs"/>

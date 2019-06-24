@@ -118,6 +118,15 @@ void appKymeraHandleInternalTonePromptPlay(const KYMERA_INTERNAL_TONE_PROMPT_PLA
                 msg->prompt, msg->tone, msg->interruptible, msg->client_lock, msg->client_lock_mask);
 
     /* If there is a tone still playing at this point, it must be an interruptable tone, so cut it off */
+
+#ifdef CHAIN_MIC_SPK
+		if (mic_spk_flag) 
+		{
+			appKymerLoopbackStop(); //xw
+			mic_spk_flag = 0;
+		} 
+#endif 
+
     appKymeraTonePromptStop();
 
     switch (theKymera->state)

@@ -525,6 +525,14 @@ bool appKymeraHandleInternalA2dpStart(const KYMERA_INTERNAL_A2DP_START_T *msg)
          * it must be an interruptable tone, so cut it off */
         appKymeraTonePromptStop();
     }
+	
+#ifdef CHAIN_MIC_SPK
+	if (mic_spk_flag)  //xw
+	{
+		appKymerLoopbackStop();
+		mic_spk_flag=0;
+	}
+#endif
 
     if (appA2dpIsSeidNonTwsSink(seid))
     {

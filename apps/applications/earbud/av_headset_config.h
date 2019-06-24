@@ -69,7 +69,17 @@ appHandleClDmLocalNameComplete*/
 /*主从切换自动播放*/
 #define PEER_SWTICH
 
-#define NAME_USER	FALSE
+/*调试模式管理，包括：设备名、充电不关机、EQ调试开关*/
+#define NAME_USER	TRUE
+
+/*voice prompt swtich to tone*/
+#define USER_TONE
+
+
+//#define CHAIN_MIC_SPK
+
+/*BQB需要，关闭tws主机的source role*/
+//#define DISABLE_A2DP_SOURCE
 
 /*==============================END==============================*/
 
@@ -370,6 +380,8 @@ appHandleClDmLocalNameComplete*/
     the level has changed. Units of milli-volts */
 #define appConfigSmBatteryHysteresisMargin() (50)
 
+/*! Setting used to indicate that the MIC to use is not configured */
+#define NO_MIC  (0xFF)
 
 /*! Define which channel the 'left' audio channel comes out of. */
 #define appConfigLeftAudioChannel()              (AUDIO_CHANNEL_A)

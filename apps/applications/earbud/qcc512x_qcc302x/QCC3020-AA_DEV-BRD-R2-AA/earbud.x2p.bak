@@ -24,6 +24,7 @@
         <file path="../../av_headset_kymera.c"/>
         <file path="../../av_headset_kymera_a2dp.c"/>
         <file path="../../av_headset_kymera_common.c"/>
+        <file path="../../av_headset_kymera_mic_spk.c"/>
         <file path="../../av_headset_kymera_sco.c"/>
         <file path="../../av_headset_kymera_tones_prompts.c"/>
         <file path="../../av_headset_led.c"/>
@@ -60,6 +61,7 @@
         <file path="../../chains/chain_forwarding_input_aptx_right.chain"/>
         <file path="../../chains/chain_forwarding_input_sbc_left.chain"/>
         <file path="../../chains/chain_forwarding_input_sbc_right.chain"/>
+        <file path="../../chains/chain_loopback.chain"/>
         <file path="../../chains/chain_micfwd_nb.chain"/>
         <file path="../../chains/chain_micfwd_nb_2mic.chain"/>
         <file path="../../chains/chain_micfwd_send.chain"/>
@@ -146,32 +148,7 @@
             <property name="CHIP_TYPE">qcc512x_qcc302x</property>
             <property name="DBG_CORE">app/p1</property>
             <property name="DEFAULT_LIBS">usb_early_init</property>
-            <property name="DEFS">AV_DEBUG BLUELAB DEBUG HAVE_1_BUTTON HAVE_2_LEDS HAVE_32BIT_DATA_WIDTH HAVE_THERMISTORx HYDRA HYDRACORE INCLUDE_AV INCLUDE_CHARGER INCLUDE_DFU INCLUDE_GATT INCLUDE_HFP INCLUDE_MICFWD INCLUDE_PROMPTS INCLUDE_SCOFWD INCLUDE_TEMPERATUREx INCLUDE_TONES INSTALL_HYDRA_LOG QCC3020_AA_DEV_BRD_R2_AA THERMISTOR_ADC=adcsel_led5 THERMISTOR_DATA_FILE=thermistor_lp4549652p3m.h THERMISTOR_ON=THERMISTOR_PIO_UNUSED USE_BDADDR_FOR_LEFT_RIGHT __KALIMBA__</property>
-            <property name="EXTRA_WARNINGS">FALSE</property>
-            <property name="FLASH_CONFIG">..\..\32Mbit_default_flash_config.py</property>
-            <property name="HW_VARIANT">QCC3020-AA_DEV-BRD-R2-AA</property>
-            <property name="INCPATHS">../../../../installed_libs\include\firmware_qcc512x_qcc302x ../../../../installed_libs\include\firmware_qcc512x_qcc302x/app ../../../../installed_libs\include\profiles\default_qcc512x_qcc302x ../../../../installed_libs\include\standard ../../chains sdk://audio/kalimba/kymera/common/interface/gen/k32</property>
-            <property name="LIBPATHS">../../../../installed_libs\lib\default_qcc512x_qcc302x\native ../../../../installed_libs\lib\os\qcc512x_qcc302x</property>
-            <property name="LIBS">a2dp audio_processor avrcp bdaddr byte_utils chain connection cryptovm custom_operator file_list gaia gatt gatt_gap_server gatt_manager gatt_server hfp input_event_manager operators packetiser_helper pio_common region rtime rwcp_server sdp_parse service system_clock upgrade vmal</property>
-            <property name="OUTPUT">earbud</property>
-            <property name="OUTPUT_TYPE">EXECUTABLE</property>
-            <property name="PRESERVED_LIBS">qcc512x_qcc302x</property>
-            <property name="PRIVATE_DEFS">AURA</property>
-            <property name="PRIVATE_INCPATHS">include/*.h</property>
-            <property name="STRIP_SYMBOLS">FALSE</property>
-        </configuration>
-        <configuration name="debug" kit="kitres://{2d6c5c72-978a-49f9-b1d3-44fd40bb227f}" options="clean|build|deploy|run|default">
-            <devkitConfiguration>application</devkitConfiguration>
-            <devkitPath>E:/qtil/ADK_QCC512X_QCC302X_WIN_6.4.0.34</devkitPath>
-            <devkitGroup>kitres://{bbac163c-41be-4ce7-b236-236f15ff18ca}</devkitGroup>
-            <deployProject>deploy</deployProject>
-            <devkitRevision>1560974054</devkitRevision>
-            <property name="BUILD_ID">sdk://tools/ubuild/maker/buildid/examples/timestamp.py</property>
-            <property name="BUILD_TYPE">DEBUG</property>
-            <property name="CHIP_TYPE">qcc512x_qcc302x</property>
-            <property name="DBG_CORE">app/p1</property>
-            <property name="DEFAULT_LIBS">usb_early_init</property>
-            <property name="DEFS">AV_DEBUG BLUELAB DEBUG HAVE_1_BUTTON HAVE_2_LEDS HAVE_32BIT_DATA_WIDTH HAVE_THERMISTORx HYDRA HYDRACORE INCLUDE_AV INCLUDE_CHARGER INCLUDE_DFU INCLUDE_GATT INCLUDE_HFP INCLUDE_MICFWD INCLUDE_PROMPTS INCLUDE_SCOFWD INCLUDE_TEMPERATUREx INCLUDE_TONES INSTALL_HYDRA_LOG QCC3020_AA_DEV_BRD_R2_AA THERMISTOR_ADC=adcsel_led5 THERMISTOR_DATA_FILE=thermistor_lp4549652p3m.h THERMISTOR_ON=THERMISTOR_PIO_UNUSED USE_BDADDR_FOR_LEFT_RIGHT __KALIMBA__</property>
+            <property name="DEFS">AV_DEBUG BLUELAB DEBUG HAVE_1_BUTTON HAVE_2_LEDS HAVE_32BIT_DATA_WIDTH HAVE_THERMISTORx HYDRA HYDRACORE INCLUDE_AV INCLUDE_CHARGER INCLUDE_DFU INCLUDE_GATT INCLUDE_HFP INCLUDE_MICFWD INCLUDE_PROMPTS INCLUDE_SCOFWD INCLUDE_TEMPERATUREx INCLUDE_TONES INSTALL_HYDRA_LOG QCC3020_AA_DEV_BRD_R2_AA THERMISTOR_ADC=adcsel_led5 THERMISTOR_DATA_FILE=thermistor_lp4549652p3m.h THERMISTOR_ON=THERMISTOR_PIO_UNUSED USE_BDADDR_FOR_LEFT_RIGHT __KALIMBA__ CHAIN_MIC_SPK</property>
             <property name="EXTRA_WARNINGS">FALSE</property>
             <property name="FLASH_CONFIG">..\..\32Mbit_default_flash_config.py</property>
             <property name="HW_VARIANT">QCC3020-AA_DEV-BRD-R2-AA</property>

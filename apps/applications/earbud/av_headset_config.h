@@ -70,7 +70,7 @@ appHandleClDmLocalNameComplete*/
 #define PEER_SWTICH
 
 /*调试模式管理，包括：设备名、充电不关机、EQ调试开关*/
-#define NAME_USER	TRUE
+#define NAME_USER	FALSE
 
 /*voice prompt swtich to tone*/
 #define USER_TONE

@@ -491,6 +491,7 @@ static void appLinkPolicyUpdateRole(const bdaddr *bd_addr, hci_role role)
 				DEBUG_LOG("----------play-------");
 				appPeerSyncPeerPlayingClear();
 				appAvPlay(FALSE);
+				appAvPlay(FALSE);
 			}
 #endif
         }

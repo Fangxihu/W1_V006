@@ -30,8 +30,8 @@
 #ifdef	AUTO_POWER_OFF
 //#define appConfigPowerOffTimeoutMs()   D_SEC(300)
 
-#define appConfigPowerOffCheckInterval()   D_SEC(5)
-#define AUTOPOWEROFFCOUNT	120
+#define appConfigPowerOffCheckInterval()   D_SEC(2)
+#define AUTOPOWEROFFCOUNT	300
 #endif
 
 static void appSmHandleInternalDeleteHandsets(void);
@@ -49,7 +49,7 @@ static void appSmHandleAutoPairing(const bdaddr *bd_addr);
 static void appSmAtuoPowerOff(void)
 {
     smTaskData* sm = appGetSm();
-
+	
 	MessageCancelAll(appGetSmTask(), SM_INTERNAL_TIMEOUT_POWER_OFF);
 	MessageSendLater(appGetSmTask(), SM_INTERNAL_TIMEOUT_POWER_OFF, NULL, appConfigPowerOffCheckInterval());
 	
@@ -62,8 +62,14 @@ static void appSmAtuoPowerOff(void)
 		}
 		else	{
 			sm->auto_power_off_times++;
-			if(sm->auto_power_off_times > AUTOPOWEROFFCOUNT)	{
+			if((sm->auto_power_off_times > AUTOPOWEROFFCOUNT) && (!appGetPower()->user_initiated_shutdown))	{
 				appPowerOffRequest();
+				//appUiPowerOff(&appGetPower()->lock, 0x11);
+				//appPowerDoPowerOff();
+			}
+			else if(appGetPower()->user_initiated_shutdown)
+			{
+				appPowerDoPowerOff();
 			}
 		}
 	}

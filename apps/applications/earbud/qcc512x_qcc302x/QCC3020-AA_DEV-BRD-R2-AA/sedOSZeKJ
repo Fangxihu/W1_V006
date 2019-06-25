@@ -1,0 +1,45 @@
+
+
+
+
+
+
+
+
+
+
+primary_service {
+    uuid : 0x1801,
+    name : "GATT_SERVICE",
+    characteristic {
+        uuid : 0x2A05,
+        name : "GATT_SERVICE_CHANGED",
+        properties : [ indicate ],
+        client_config
+        {
+            name : "GATT_SERVICE_CHANGED_CLIENT_CONFIG",
+            flags : [ FLAG_IRQ ]
+        }
+    }
+},
+
+
+
+
+primary_service {
+    uuid : 0x1800,
+    name : "GAP_SERVICE",
+    sdp : true,
+    characteristic {
+        uuid : 0x2A00,
+        name : "DEVICE_NAME",
+        flags : [ FLAG_IRQ ],
+        properties : [ read ]
+    },
+    characteristic {
+        uuid : 0x2A01,
+        name : "DEVICE_APPEARANCE",
+        flags : [ FLAG_IRQ ],
+        properties : [ read ]
+    }
+},

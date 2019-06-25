@@ -200,7 +200,7 @@ typedef struct
 	
 #endif
 #ifdef	AUTO_POWER_OFF
-	uint8 auto_power_off_times;
+	uint16 auto_power_off_times;
 #endif
 } smTaskData;
 

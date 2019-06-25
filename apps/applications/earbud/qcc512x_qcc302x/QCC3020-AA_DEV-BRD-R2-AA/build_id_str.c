@@ -2,5 +2,5 @@
 
 /** This file will be re-generated on each build */
 
-const uint8 build_id_string[] = "QTIL ADK 2019-06-24 19:50:42 @1561377042";
-const uint32 build_id_number = 1561377042UL;
+const uint8 build_id_string[] = "QTIL ADK 2019-06-25 18:11:01 @1561457461";
+const uint32 build_id_number = 1561457461UL;

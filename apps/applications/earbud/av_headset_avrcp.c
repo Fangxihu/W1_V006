@@ -1247,9 +1247,13 @@ static void appAvrcpHandleAvrcpPassthroughConfirm(avInstanceTaskData *theInst, c
 {
     DEBUG_LOGF("appAvrcpHandleAvrcpPassthroughConfirm(%p), status %d", (void *)theInst, cfm->status);
     DEBUG_LOGF("appAvrcpHandleAvrcpPassthroughConfirm %p %p", theInst->avrcp.avrcp, cfm->avrcp);
-    
+	DEBUG_LOG("????rerere!!!");
     switch (appAvrcpGetState(theInst))
     {
+    
+	    DEBUG_LOG("????do what!!!");
+		
+		DEBUG_LOGF("app Avrcp Get State = %d", appAvrcpGetState(theInst));
         case AVRCP_STATE_CONNECTED:
         {
             /* Clear operation lock */

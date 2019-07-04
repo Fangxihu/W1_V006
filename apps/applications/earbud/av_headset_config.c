@@ -114,11 +114,6 @@ const promptConfig prompt_config[] =
         .rate = 48000,
         .format = PROMPT_FORMAT_SBC,
     },
-	[PROMPT_RING_TONE] = {
-		.filename = "ring_tone.wav",
-		.rate = 8000,
-		.format = PROMPT_FORMAT_PCM,
-	},
 #ifdef BATTERY_LOW
     [PROMPT_BATTERY_LOW] = {
         .filename = "BatteryLow16k.sbc",

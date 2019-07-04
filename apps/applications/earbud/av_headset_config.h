@@ -70,7 +70,7 @@ appHandleClDmLocalNameComplete*/
 #define PEER_SWTICH
 
 /*调试模式管理，包括：设备名、充电不关机、EQ调试开关*/
-#define NAME_USER	FALSE
+#define NAME_USER	FALSE	//FALSE
 
 /*voice prompt swtich to tone*/
 #define USER_TONE
@@ -80,6 +80,10 @@ appHandleClDmLocalNameComplete*/
 
 /*BQB需要，关闭tws主机的source role*/
 //#define DISABLE_A2DP_SOURCE
+
+
+/*handle volume sync*/
+#define SYNC_VOL
 
 /*==============================END==============================*/
 
@@ -268,7 +272,7 @@ appHandleClDmLocalNameComplete*/
 #define appConfigMaxVolumedB() (0)
 
 /*! Default volume gain in dB */
-#define appConfigDefaultVolumedB() (0)
+#define appConfigDefaultVolumedB() (-10)
 
 /*! The volume setting to use for no gain, when volume is specifed on range of 0-127 */
 #define appConfigVolumeNoGain127Step()  (127)

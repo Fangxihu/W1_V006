@@ -1114,10 +1114,11 @@ static void appHfpHandleHfpRingIndication(const HFP_RING_IND_T *ind)
                 /* Start HSP incoming call timeout */
                 MessageSendLater(appGetHfpTask(), HFP_INTERNAL_HSP_INCOMING_TIMEOUT, 0, D_SEC(5));
             }
-
+#if 0
             /* Play ring tone if AG doesn't support in band ringing */
             if (!ind->in_band && !appGetHfp()->call_accepted)
                 appUiHfpRing(appGetHfp()->caller_id_active);
+#endif
         }
         return;
 
@@ -2516,7 +2517,7 @@ void appHfpCallHangup(void)
         case HFP_STATE_CONNECTED_ACTIVE:
         {    
             /* Play tone */
-            appUiHfpHangup();
+            //appUiHfpHangup();
 
             /* Send message into HFP state machine */
             MessageSendConditionally(appGetHfpTask(), HFP_INTERNAL_HFP_CALL_HANGUP_REQ,

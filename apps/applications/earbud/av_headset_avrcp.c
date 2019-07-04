@@ -1247,7 +1247,6 @@ static void appAvrcpHandleAvrcpPassthroughConfirm(avInstanceTaskData *theInst, c
 {
     DEBUG_LOGF("appAvrcpHandleAvrcpPassthroughConfirm(%p), status %d", (void *)theInst, cfm->status);
     DEBUG_LOGF("appAvrcpHandleAvrcpPassthroughConfirm %p %p", theInst->avrcp.avrcp, cfm->avrcp);
-	DEBUG_LOG("????rerere!!!");
     switch (appAvrcpGetState(theInst))
     {
     
@@ -1525,15 +1524,30 @@ static void appAvrcpHandleRegisterNotificationInd(avInstanceTaskData *theInst, A
 
 /*! \brief Absolute volume change from A2DP Source (Handset or TWS Master)
 */
-/*´ÓÊÖ»ú¶ËÒôÁ¿¸Ä±äµÄÊ±ºò»ØÍ¨Öªµ½Õâ±ß£¬Î¨Ò»Èë¿Ú*/
+/*ä»æ‰‹æœºç«¯éŸ³é‡æ”¹å˜çš„æ—¶å€™å›é€šçŸ¥åˆ°è¿™è¾¹ï¼Œå”¯ä¸€å…¥å£*/
 static void appAvrcpHandleSetAbsoluteVolumeInd(avInstanceTaskData *theInst, AVRCP_SET_ABSOLUTE_VOLUME_IND_T *ind)
 {
     assert(theInst->avrcp.avrcp == ind->avrcp);
-    DEBUG_LOGF("appAvrcpHandleSetAbsoluteVolumeInd(%p), volume %u", (void *)theInst, ind->volume);
+    DEBUG_LOGF("appAvrcpHandleSetAbsoluteVolumeInd(%p), volume %u, theInst->avrcp.volume %u", (void *)theInst, ind->volume, theInst->avrcp.volume);
+
+#ifdef	SYNC_VOL
+	if(appSmSyncVolGet())
+	{
+		//uint8	volume;
+		//appDeviceGetVolume(&theInst->bd_addr, &volume);
+		//if(volume != ind->volume)
+		{
+			//PanicFalse(appAvApplyVolume(volume));
+			appSmSyncVolSendMessage(2);
+			//appAvVolumeSet(volume, NULL);
+			//appAvAvrcpVolumeNotification(theInst, volume);
+		}
+	}
+#endif
 
     theInst->avrcp.volume = ind->volume;
 
-    /* Send set volume ind to all clients */	/*µ«Êµ¼ÊÉÏ¶¼±»ignore£¬½öÓĞavÔÚ´¦Àí*/
+    /* Send set volume ind to all clients *//*ä½†å®é™…ä¸Šéƒ½è¢«ignoreï¼Œä»…æœ‰avåœ¨å¤„ç†*/
     MAKE_AV_MESSAGE(AV_AVRCP_SET_VOLUME_IND)
     message->av_instance = theInst;
     message->bd_addr = theInst->bd_addr;

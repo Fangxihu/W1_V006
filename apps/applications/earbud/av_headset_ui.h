@@ -51,7 +51,6 @@ typedef enum prompt_name
     PROMPT_PAIRING_FAILED,
     PROMPT_CONNECTED,
     PROMPT_DISCONNECTED,
-	PROMPT_RING_TONE,
 #ifdef BATTERY_LOW
     PROMPT_BATTERY_LOW,
 #endif
@@ -79,6 +78,7 @@ typedef struct
 #ifdef INCLUDE_FTSINGLEPEER
 	bool ftsingle_flag:1;				/*!< for facotry test single peer*/
 #endif
+	bool vol_change_flag:1;				/*!< User initiated pairing */
 } uiTaskData;
 
 /*! Audio prompt configuration */
@@ -236,7 +236,7 @@ extern const ringtone_note app_tone_av_link_loss[];
 
 /*! \brief Play HFP answer call tone */
 #define appUiHfpAnswer() \
-    appUiPlayTone(app_tone_hfp_answer)
+/*    appUiPlayTone(app_tone_hfp_answer)*/
 
 /*! \brief Play HFP reject call tone */
 #define appUiHfpReject() \
@@ -244,7 +244,7 @@ extern const ringtone_note app_tone_av_link_loss[];
 
 /*! \brief Play HFP hangup call tone */
 #define appUiHfpHangup() \
-    appUiPlayTone(app_tone_hfp_hangup)
+ /*   appUiPlayTone(app_tone_hfp_hangup)*/
 
 /*! \brief Play HFP transfer call tone */
 #define appUiHfpTransfer() \
@@ -299,11 +299,11 @@ extern const ringtone_note app_tone_av_link_loss[];
 
 /*! \brief Play HFP SCO connected tone */
 #define appUiHfpScoConnected() \
-    appUiPlayTone(app_tone_hfp_sco_connected)
+    /*appUiPlayTone(app_tone_hfp_sco_connected)*/
 
 /*! \brief Play HFP SCO disconnected tone */
 #define appUiHfpScoDisconnected() \
-    appUiPlayTone(app_tone_hfp_sco_disconnected)
+   /* appUiPlayTone(app_tone_hfp_sco_disconnected)*/
 
 /*! \brief Show HFP incoming call LED pattern */
 #define appUiHfpCallIncomingActive() \

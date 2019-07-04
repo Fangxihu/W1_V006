@@ -416,7 +416,7 @@ void appKymeraHandleInternalScoForwardingStopRx(void);
 #endif
 
 #ifdef CHAIN_MIC_SPK
-uint8 mic_spk_flag;
+extern uint8 mic_spk_flag;
 /*! Get current state */
 #define appKymeraGetState() (appGetKymera()->state)
 

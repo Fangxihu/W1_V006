@@ -84,6 +84,22 @@ void appKymeraA2dpStart(uint16 *client_lock, uint16 client_lock_mask,
     kymeraTaskData *theKymera = appGetKymera();
 
     DEBUG_LOGF("appKymeraA2dpStart, seid=%u", codec_settings->seid);
+#ifdef	SYNC_VOL
+	if(appSmSyncVolGet())
+	{
+		smTaskData *sm = appGetSm();
+		DEBUG_LOGF("appKymeraA2dpStart, volume %u, sm->volume %u", volume, sm->volume);
+		if(volume == sm->volume)
+		{
+			appSmSyncVolSet(FALSE);
+		}
+		else
+		{
+			volume = sm->volume;
+			appSmSyncVolSendMessage(1);
+		}
+	}
+#endif
 
     MAKE_KYMERA_MESSAGE(KYMERA_INTERNAL_A2DP_START);
     message->lock = client_lock;

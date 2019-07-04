@@ -39,7 +39,7 @@
 
 #endif /* HFP_USE_2MIC */
 
-#ifdef CHAIN_MIC_SPK
+#if 0//def CHAIN_MIC_SPK
 #include "chains/chain_prompt_decoder.h"
 #include "chains/chain_prompt_decoder_no_iir.h"
 #include "chains/chain_prompt_pcm.h"
@@ -240,6 +240,13 @@ void appKymeraHandleInternalScoStart(Sink audio_sink, hfp_wbs_codec_mask codec,
          * it must be an interruptible tone, so cut it off */
         appKymeraTonePromptStop();
     }
+#ifdef CHAIN_MIC_SPK
+		if (mic_spk_flag) 
+		{
+			appKymerLoopbackStop(); //xw
+			mic_spk_flag = 0;
+		} 
+#endif 
 
     /* Can't start voice chain if we're not idle */
     PanicFalse(theKymera->state == KYMERA_STATE_IDLE);
@@ -581,6 +588,13 @@ void appKymeraHandleInternalScoForwardingStartRx(const KYMERA_INTERNAL_SCOFWD_RX
          * it must be an interruptible tone, so cut it off */
         appKymeraTonePromptStop();
     }
+#ifdef CHAIN_MIC_SPK
+		if (mic_spk_flag) 
+		{
+			appKymerLoopbackStop(); //xw
+			mic_spk_flag = 0;
+		} 
+#endif 
 
     /* If we are not idle (a pre-requisite) and this message can be delayed,
        then re-send it. The normal situation is message delays when stopping 
@@ -817,7 +831,7 @@ uint8 appKymeraScoVoiceQuality(void)
     return quality;
 }
 
-#ifdef CHAIN_MIC_SPK
+#if 0//def CHAIN_MIC_SPK
 
 void appKymerStartLoopback(void)
 {

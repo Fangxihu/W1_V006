@@ -46,7 +46,7 @@ static Source appKymeraCreateMicPromptChain(const KYMERA_INTERNAL_TONE_PROMPT_PL
     return ChainGetOutput(chain, EPR_TONE_PROMPT_CHAIN_OUT);
 }
 #endif
-
+#if 0
 void appKymerStartLoopback(void)
 {
     if (appKymeraGetState() == KYMERA_STATE_TONE_PLAYING)   
@@ -62,23 +62,18 @@ void appKymerStartLoopback(void)
 	//set volume
 	appKymeraSetMainVolume(loop_chain, 150);
     /* Get microphone sources */    
-	//Source mic_src_1a;    
-	//Source mic_src_1b;   
-	//appKymeraMicSetup(appConfigMicAudioInstance(), &mic_src_1a, appConfigMicAudioInstance(), &mic_src_1b, 8000);
-
-    Source mic_src1 = StreamAudioSource(AUDIO_HARDWARE_CODEC, appConfigMicAudioInstance(), AUDIO_CHANNEL_A);
-    /* Set DAC and ADC sample rate */
-    SourceConfigure(mic_src1, STREAM_CODEC_INPUT_RATE, 8000);
-    SourceConfigure(mic_src1, STREAM_CODEC_INPUT_GAIN, appConfigMicGain());
+	Source mic_src_1a;    
+	Source mic_src_1b;   
+    //appKymeraMicSetup(appConfigScoMic1(), &mic_src_1a, appConfigScoMic2(), &mic_src_1b, 8000);
 
     /* Get speaker sink */   
-	Sink spk_snk = StreamAudioSink(AUDIO_HARDWARE_CODEC, AUDIO_INSTANCE_0, appConfigLeftAudioChannel());    
+	Sink spk_snk = StreamAudioSink(appConfigLeftAudioHardware(), appConfigLeftAudioInstance(), appConfigLeftAudioChannel());    
 	SinkConfigure(spk_snk, STREAM_CODEC_OUTPUT_RATE, 8000);
     /* Get sources and sinks for chain endpoints */   
 	Source spk_src  = ChainGetOutput(loop_chain, EPR_SOURCE_MIXER_OUT);    
 	Sink mic_snk    = ChainGetInput(loop_chain, EPR_SCO_MIC1);
     /* Connect mic and speake to chain endpoints */   
-        StreamConnect(mic_src1, mic_snk);
+        StreamConnect(mic_src_1a, mic_snk);
         StreamConnect(spk_src, spk_snk);
     /* Connect chain */    
 	ChainConnect(loop_chain);
@@ -86,13 +81,13 @@ void appKymerStartLoopback(void)
 	//    appKymeraConfigureDspPowerMode(TRUE);
     ChainStart(loop_chain);
 }
-
+#endif
 /************************************************************
                         开启MIC-> SPK通道
 *************************************************************/
 void appKymerLoopbackStart(void)
 {    
-    DEBUG_LOG("=================Start=========================");
+    //DEBUG_LOGF("=================Start=========================");
 	kymeraTaskData *theKymera = appGetKymera();
     if (appKymeraGetState() == KYMERA_STATE_TONE_PLAYING)  
 	{        /* If there is a tone still playing at this point,        
@@ -107,45 +102,40 @@ void appKymerLoopbackStart(void)
 	theKymera->loopback_handle = loop_chain;
 	
     //Set volume    
-        appKymeraSetMainVolume(loop_chain, 160);
+        appKymeraSetMainVolume(loop_chain, 127);
         //appKymeraSetVolume(loop_chain, 127);
-    /* Get microphone sources */   
-	//Source mic_src_1a;   
-	//Source mic_src_1b;   
+    /* Get microphone sources */     
 	//采样率不能超过16K
-    //appKymeraMicSetup(appConfigMicAudioInstance(), &mic_src_1a, appConfigMicAudioInstance(), &mic_src_1b, 16000);
-#if 0
-		/* Get sources and sinks for chain */
-		Source sco_src = ChainGetOutput(scoChain, EPR_SCO_TO_AIR);
-		Sink sco_sink = ChainGetInput(scoChain, EPR_SCO_FROM_AIR);
-		Source audio_source = StreamSourceFromSink(audio_sink);
-		Source mic_src1 = StreamAudioSource(AUDIO_HARDWARE_CODEC, appConfigMicAudioInstance(), AUDIO_CHANNEL_A);
-		Sink mic_sink1 = ChainGetInput(scoChain, EPR_SCO_MIC1);
+	Source mic_src_1a = StreamAudioSource(AUDIO_HARDWARE_CODEC, appConfigMicAudioInstance(), AUDIO_CHANNEL_A);
+    Sink mic_snk = ChainGetInput(loop_chain, EPR_SCO_MIC1);
 #ifdef HFP_USE_2MIC
-		Source mic_src1b = StreamAudioSource(AUDIO_HARDWARE_CODEC, appConfigMicAudioInstance(), AUDIO_CHANNEL_B);
-		Sink mic_sink1b = ChainGetInput(scoChain, EPR_SCO_MIC2);
+    Source mic_src_1b = StreamAudioSource(AUDIO_HARDWARE_CODEC, appConfigMicAudioInstance(), AUDIO_CHANNEL_B);
+    Sink mic_sink1b = ChainGetInput(scoChain, EPR_SCO_MIC2);
 #endif
-		Source speaker_src = ChainGetOutput(scoChain, EPR_SCO_SPEAKER);
-		//Sink speaker_snk = StreamAudioSink(AUDIO_HARDWARE_CODEC, AUDIO_INSTANCE_0, appConfigLeftAudioChannel());
-#endif
-
-    Source mic_src1 = StreamAudioSource(AUDIO_HARDWARE_CODEC, appConfigMicAudioInstance(), AUDIO_CHANNEL_A);
-    /* Set DAC and ADC sample rate */
-    SourceConfigure(mic_src1, STREAM_CODEC_INPUT_RATE, 8000);
-    SourceConfigure(mic_src1, STREAM_CODEC_INPUT_GAIN, appConfigMicGain());
 
 
     /* Get speaker sink */   
 	Sink spk_snk = StreamAudioSink(AUDIO_HARDWARE_CODEC, AUDIO_INSTANCE_0, appConfigLeftAudioChannel());    
-    SinkConfigure(spk_snk, STREAM_CODEC_OUTPUT_RATE, 16000);
+
     /* Get sources and sinks for chain endpoints */   
 	Source spk_src  = ChainGetOutput(loop_chain, EPR_SOURCE_MIXER_OUT);    
-	Sink mic_snk    = ChainGetInput(loop_chain, EPR_SCO_MIC1);
+
+/* Set DAC and ADC sample rate */
+    SourceConfigure(mic_src_1a, STREAM_CODEC_INPUT_RATE, 8000);
+    SourceConfigure(mic_src_1a, STREAM_CODEC_INPUT_GAIN, appConfigMicGain());
+#ifdef HFP_USE_2MIC
+    SourceConfigure(mic_src1b, STREAM_CODEC_INPUT_RATE, 8000);
+    SourceConfigure(mic_src1b, STREAM_CODEC_INPUT_GAIN, appConfigMicGain());
+    SourceSynchronise(mic_src1,mic_src1b);
+#endif
+	SinkConfigure(spk_snk, STREAM_CODEC_OUTPUT_RATE, 8000);
     /* Connect mic and speake to chain endpoints */   
-        StreamConnect(mic_src1, mic_snk);
+        StreamConnect(mic_src_1a, mic_snk);
         StreamConnect(spk_src, spk_snk);
     /* Connect chain */   
 	ChainConnect(loop_chain);
+    /* Turn on MIC bias */
+        MicbiasConfigure(MIC_BIAS_0, MIC_BIAS_ENABLE, MIC_BIAS_FORCE_ON);
     ChainStart(loop_chain);
 }
 
@@ -154,12 +144,14 @@ void appKymerLoopbackStart(void)
 *************************************************************/
 void appKymerLoopbackStop(void)
 {    
-    DEBUG_LOG("===============Stop==========================");
+	appScoFwdLoopbackStop();
+
+    //DEBUG_LOGF("===============Stop==========================");
     kymeraTaskData *theKymera = appGetKymera();
 
 	kymera_chain_handle_t loop_chain = theKymera->loopback_handle;    
 	/* A tone still playing at this point must be interruptable */    
-	//appKymeraTonePromptStop();   //开启tone 时不会影响好mic->spk 的通道
+    //appKymeraTonePromptStop();   //开启tone 时不会影响好mic->spk 的通道
     /* Stop chains before disconnecting */   
 	ChainStop(loop_chain);
     /* Get sources and sinks for chain endpoints */   
@@ -169,19 +161,17 @@ void appKymerLoopbackStop(void)
 	StreamDisconnect(spk_src, NULL);    
 	/* Disconnect microphones from chain microphone endpoints */   
 	StreamDisconnect(NULL, mic_snk);
-
-	
-    StreamDisconnect(spk_src, mic_snk);
+    /* Close microphone sources */  
+    //appKymeraMicCleanup(appConfigScoMic1(), appConfigScoMic2());
 
     /* Turn off MIC bias */
-    /*! \todo Check if MIC_BIAS different for 2 mic */
-    MicbiasConfigure(MIC_BIAS_0, MIC_BIAS_ENABLE, MIC_BIAS_OFF);
-	
-    /* Close microphone sources */  
-	//appKymeraMicCleanup(appConfigMicAudioInstance(), appConfigMicAudioInstance());
+        /*! \todo Check if MIC_BIAS different for 2 mic */
+        MicbiasConfigure(MIC_BIAS_0, MIC_BIAS_ENABLE, MIC_BIAS_OFF);
+
+        /* Update state variables */
+        theKymera->state = KYMERA_STATE_IDLE;
+        theKymera->output_rate = 0;
     /* Destroy chains now that input has been disconnected */   
 	ChainDestroy(loop_chain);
 }
 #endif
-
-

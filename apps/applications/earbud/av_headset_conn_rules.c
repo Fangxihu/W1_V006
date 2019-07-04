@@ -511,6 +511,7 @@ static ruleAction ruleForwardLinkKeys(void)
     endif
     @enduml 
 */
+/*在这里直接都返回run的话，一起出盒很容易全都进回连*/
 static ruleAction ruleConnectBatteryVoltage(ruleConnectReason reason)
 {
     uint16 battery_level, peer_battery_level;
@@ -518,7 +519,47 @@ static ruleAction ruleConnectBatteryVoltage(ruleConnectReason reason)
 
     appPeerSyncGetPeerBatteryLevel(&battery_level, &peer_battery_level);
     RULE_LOGF("ruleConnectBatteryVoltage, battery %u, peer battery %u", battery_level, peer_battery_level);
+	
+    if (battery_level > peer_battery_level)
+    {
+        RULE_LOG("ruleConnectBatteryVoltage, run as our battery is higher");
+        return RULE_ACTION_RUN;
+    }
+    else if (battery_level == peer_battery_level)
+    {
+        if (appConfigIsLeft())
+        {
+            RULE_LOG("ruleConnectBatteryVoltage, equal, run as left earbud");
+            return RULE_ACTION_RUN;
+        }
+        else
+        {
+            RULE_LOG("ruleConnectBatteryVoltage, equal, ignore as right earbud");
+#ifdef RECONNECT_HANDSET
+			appScoFwdCheckRuleConnect();
+#endif
+            return RULE_ACTION_IGNORE;
+        }
+    }
+    else
+    {
+            RULE_LOG("ruleConnectBatteryVoltage, ignore as our battery is lower");
+#ifdef RECONNECT_HANDSET
+			appScoFwdCheckRuleConnect();
+#endif
+            return RULE_ACTION_IGNORE;
+    }
+}
 
+/*为了处理同时拿出来不会连的问题*/
+#if 0//ef RECONNECT_HANDSET
+static ruleAction ruleUserBatteryVoltage(void)
+{
+    uint16 battery_level, peer_battery_level;
+
+    appPeerSyncGetPeerBatteryLevel(&battery_level, &peer_battery_level);
+    RULE_LOGF("ruleUserBatteryVoltage, battery %u, peer battery %u", battery_level, peer_battery_level);
+	
     if (battery_level > peer_battery_level)
     {
         RULE_LOG("ruleConnectBatteryVoltage, run as our battery is higher");
@@ -543,6 +584,8 @@ static ruleAction ruleConnectBatteryVoltage(ruleConnectReason reason)
             return RULE_ACTION_IGNORE;
     }
 }
+
+#endif
 
 /*! @brief Sub-rule to determine if Earbud should connect to standard handset
 */
@@ -589,6 +632,8 @@ static ruleAction ruleConnectHandsetStandard(ruleConnectReason reason)
 						}
 						else
 						{
+							appScoFwdChekConnectFlag(TRUE);
+							//return ruleConnectBatteryVoltage(reason);
 							return RULE_ACTION_IGNORE;
 						}
 					}
@@ -700,6 +745,9 @@ static ruleAction ruleConnectHandset(ruleConnectReason reason)
 	
 #ifdef RECONNECT_HANDSET
 	ruleConnectSetReason(reason);
+#endif
+#ifdef RECONNECT_HANDSET
+	appScoFwdChekConnectFlag(FALSE);
 #endif
 
     /* Don't attempt to connect if we're in the case */

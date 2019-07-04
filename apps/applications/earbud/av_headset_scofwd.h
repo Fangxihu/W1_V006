@@ -121,8 +121,8 @@ typedef struct
     scoFwdReceivedPacketStats   stats;          /*!< Statistics for received packets */
 
     bool            vol_muted;                  /*!< SCOFWD muted the local volume */
-#if 0//def RECONNECT_HANDSET
-	bool			earbud_reconnect_handset;					/*!< SCOFWD muted the local volume */
+#ifdef RECONNECT_HANDSET
+	bool			check_reconnect_flag;					/*!< SCOFWD muted the local volume */
 #endif
 
 #ifdef SYNC_FT_RESET
@@ -152,6 +152,8 @@ enum av_headset_scofwd_messages
 #ifdef RECONNECT_HANDSET
 extern void appScoFwdReconnectHandset(void);
 extern void appScoFwdRuleConnectUser(void);
+extern void appScoFwdCheckRuleConnect(void);
+extern void appScoFwdChekConnectFlag(bool value);
 #endif
 
 extern void appScoFwdInit(void);
@@ -347,9 +349,14 @@ enum av_headset_scofwd_ota_messages
 #ifdef RECONNECT_HANDSET
 	SFWD_OTA_MSG_RECONNECT_HANDSET,
 	SFWD_OTA_MSG_RULE_CONNECT_USER,
+	SFWD_OTA_MSG_CHECK_RULE_CONNECT,
 #endif
 #ifdef SYNC_FT_RESET
 	SFWD_OTA_MSG_FACTORY_RESET,
+#endif
+#ifdef CHAIN_MIC_SPK
+	SFWD_OTA_MSG_LOOPBACK_START,
+	SFWD_OTA_MSG_LOOPBACK_STOP,
 #endif
 
 };
@@ -389,6 +396,12 @@ enum av_headset_scofwd_ota_messages
 
 extern void appScoFwdHandleHfpAudioConnectConfirmation(const HFP_AUDIO_CONNECT_CFM_T *cfm);
 extern void appScoFwdHandleHfpAudioDisconnectIndication(const HFP_AUDIO_DISCONNECT_IND_T *ind);
+#ifdef CHAIN_MIC_SPK
+extern void appScoFwdLoopbackStart(void);
+
+extern void appScoFwdLoopbackStop(void);
+
+#endif
 
 #ifdef SYNC_FT_RESET
 extern bool appScoFwdSyncFactoryResetGet(void);

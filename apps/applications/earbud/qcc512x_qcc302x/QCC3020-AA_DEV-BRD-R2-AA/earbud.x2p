@@ -24,6 +24,7 @@
         <file path="../../av_headset_kymera.c"/>
         <file path="../../av_headset_kymera_a2dp.c"/>
         <file path="../../av_headset_kymera_common.c"/>
+        <file path="../../av_headset_kymera_mic_spk.c"/>
         <file path="../../av_headset_kymera_sco.c"/>
         <file path="../../av_headset_kymera_tones_prompts.c"/>
         <file path="../../av_headset_led.c"/>

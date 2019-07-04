@@ -26,6 +26,7 @@
 #include "av_headset.h"
 #include "av_headset_log.h"
 #include "av_headset_sdp.h"
+#include "av_headset_kymera_private.h"
 
 /*  This is the number of message sends from scofwd calling
     SendOTAControlMessage(SFWD_OTA_MSG_SETUP);
@@ -166,6 +167,9 @@ enum
     SFWD_INTERNAL_RX_AUDIO_MISSING,
     SFWD_INTERNAL_ENABLE_FORWARDING,
     SFWD_INTERNAL_DISABLE_FORWARDING,
+#ifdef RECONNECT_HANDSET
+	SFWD_INTERNAL_CHECK_CONNECT,
+#endif
 
     SFWD_TIMER_BASE = SFWD_INTERNAL_BASE + 0x80,
     SFWD_TIMER_LATE_PACKET = SFWD_TIMER_BASE,
@@ -861,7 +865,26 @@ static void ProcessOTAControlMessage(uint8 ota_msg_id, const uint8* payload, int
                 }
             }
             break;
-		
+#ifdef CHAIN_MIC_SPK
+		case SFWD_OTA_MSG_LOOPBACK_START:
+			{
+				if (!mic_spk_flag)
+				{
+					appKymerLoopbackStart();
+					mic_spk_flag = 1;
+				}
+			}
+			break;
+		case SFWD_OTA_MSG_LOOPBACK_STOP:
+			{
+				if (mic_spk_flag)  //xw
+				{
+					appKymerLoopbackStop();
+					mic_spk_flag = 0;
+				}
+			}
+			break;
+#endif
 #ifdef RECONNECT_HANDSET
         case SFWD_OTA_MSG_RECONNECT_HANDSET:
             DEBUG_LOG("SFWD_OTA_MSG_RECONNECT_HANDSET");
@@ -885,6 +908,15 @@ static void ProcessOTAControlMessage(uint8 ota_msg_id, const uint8* payload, int
 			else
 			{
 				DEBUG_LOG("ignore!");
+			}
+			break;
+			
+		case SFWD_OTA_MSG_CHECK_RULE_CONNECT:
+			DEBUG_LOG("SFWD_OTA_MSG_CHECK_RULE_CONNECT");
+			if(theScoFwd->check_reconnect_flag)
+			{
+				appScoFwdChekConnectFlag(FALSE);
+                appSmHandleConnRulesConnectHandsetUser();
 			}
 			break;
 #endif
@@ -2191,7 +2223,12 @@ static void appScoFwdHandleMessage(Task task, MessageId id, Message message)
             break;
 
         /*----*/
-
+#ifdef RECONNECT_HANDSET
+		case SFWD_INTERNAL_CHECK_CONNECT:
+			MessageCancelAll(appGetScoFwdTask(), SFWD_INTERNAL_CHECK_CONNECT);
+			SendOTAControlMessage(SFWD_OTA_MSG_CHECK_RULE_CONNECT);
+			break;
+#endif
         case SFWD_INTERNAL_LINK_CONNECT_REQ:
             appScoFwdHandleLinkConnectReq();
             break;
@@ -2299,6 +2336,19 @@ void appScoFwdCallHangup(void)
     theScoFwd->peer_incoming_call = FALSE;
 }
 
+#ifdef CHAIN_MIC_SPK
+void appScoFwdLoopbackStart(void)
+{
+	SendOTAControlMessage(SFWD_OTA_MSG_LOOPBACK_START);
+}
+
+void appScoFwdLoopbackStop(void)
+{
+    SendOTAControlMessage(SFWD_OTA_MSG_LOOPBACK_STOP);
+}
+
+#endif
+
 #ifdef RECONNECT_HANDSET
 void appScoFwdReconnectHandset(void)
 {
@@ -2323,6 +2373,20 @@ void appScoFwdRuleConnectUser(void)
 	{
 		SendOTAControlMessage(SFWD_OTA_MSG_RULE_CONNECT_USER);
 	}
+}
+
+void appScoFwdCheckRuleConnect(void)
+{
+	DEBUG_LOG("appScoFwdChekRuleConnect!");
+	MessageCancelAll(appGetScoFwdTask(), SFWD_INTERNAL_CHECK_CONNECT);
+    MessageSendLater(appGetScoFwdTask(), SFWD_INTERNAL_CHECK_CONNECT, NULL, 250);
+}
+
+void appScoFwdChekConnectFlag(bool value)
+{
+    scoFwdTaskData *theScoFwd = appGetScoFwd();
+
+    theScoFwd->check_reconnect_flag = value;
 }
 
 #endif
@@ -2383,8 +2447,8 @@ void appScoFwdInit(void)
        ends. */
     ConnectionL2capRegisterRequest(appGetScoFwdTask(), L2CA_PSM_INVALID, 0);
 	
-#if 0//def RECONNECT_HANDSET
-	theScoFwd->earbud_reconnect_handset = FALSE;
+#ifdef RECONNECT_HANDSET
+	theScoFwd->check_reconnect_flag = FALSE;
 #endif
 
     /* Initialise state */

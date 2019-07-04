@@ -609,7 +609,7 @@ static void appPeerSyncHandlePeerSigMsgChannelTxInd(const PEER_SIG_MSG_CHANNEL_R
 #ifdef	RECONNECT_HANDSET
 	ps->peer_handset_reconnected = PEER_SYNC_STATE_IS_HANDSET_RECONNECTED(ind->msg);
 	ps->peer_handset_reconnecting = PEER_SYNC_STATE_IS_HANDSET_RECONNECTING(ind->msg);
-	DEBUG_LOGF("reconnected = %d, reconnecting = %d", ps->peer_handset_reconnected, ps->peer_handset_reconnecting);
+	DEBUG_LOGF("reconnected = %d, reconnecting = %d, in progress = %d", ps->peer_handset_reconnected, ps->peer_handset_reconnecting, ps->peer_rules_in_progress);
 #endif
 
 #ifdef	POP_UP

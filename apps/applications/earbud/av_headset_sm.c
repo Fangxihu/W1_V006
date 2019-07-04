@@ -26,6 +26,7 @@
 #include <ps.h>
 #include <boot.h>
 
+#include "av_headset_kymera_private.h"
 
 #ifdef	AUTO_POWER_OFF
 //#define appConfigPowerOffTimeoutMs()   D_SEC(300)
@@ -578,12 +579,26 @@ static void appEnterInCase(void)
 
     /* request handset signalling module send current state to handset. */
     appHandsetSigSendEarbudStateReq(PHY_STATE_IN_CASE);
-	
+#ifdef CHAIN_MIC_SPK
+	if (mic_spk_flag)  //xw
+	{
+		appKymerLoopbackStop();
+		mic_spk_flag=0;
+	}
+#endif
+#ifdef	SYNC_VOL
+	if(appSmSyncVolGet())
+	{
+		appSmSyncVolSet(FALSE);
+	}
+#endif
 #ifdef PEER_SWTICH
 		if(appPeerSyncIsPeerInCase())
 			appPeerSyncPeerPlayingClear();
 #endif
-
+#ifdef RECONNECT_HANDSET
+	appScoFwdChekConnectFlag(FALSE);
+#endif
 #ifdef RECONNECT_HANDSET
 	//appScoFwdClearReconnectFlag();
 
@@ -602,7 +617,9 @@ static void appEnterInCase(void)
 static void appEnterOutOfCase(void)
 {
     DEBUG_LOG("appEnterOutOfCase");
-
+#ifdef RECONNECT_HANDSET
+	appScoFwdChekConnectFlag(FALSE);
+#endif
     /* request handset signalling module send current state to handset. */
     appHandsetSigSendEarbudStateReq(PHY_STATE_OUT_OF_EAR);
 }
@@ -1296,6 +1313,45 @@ static void appSmHandleConnRulesConnectHandset(CONN_RULES_CONNECT_HANDSET_T* crc
 
 }
 
+#ifdef RECONNECT_HANDSET
+void appSmHandleConnRulesConnectHandsetUser(void)
+{
+	ReconnectSetState(RECONNECT_STATE_ING);
+	
+    appPeerSyncSend(FALSE);
+
+    /* Connect HFP to handset */
+    appHfpConnectHandset();
+
+    appAvConnectHandset();
+	
+	appUiReconnectingHandset();
+
+	if(ruleConnectGetReason() == RULE_CONNECT_OUT_OF_CASE)
+	{
+		DEBUG_LOG("rule Connect Reason = out of case!");
+		if((ReconnectGetState() != RECONNECT_STATE_END) && (!appSmStateInCase(appGetState()))/* && (!appPeerSyncIsPeerInCase())*/)
+		{
+			if(appPeerSyncIsPeerHandsetReconnected())
+			{
+				appSmSetReconnectAndPairing();
+				//appPairingHandsetPair(appGetSmTask(), appSmIsUserPairing());
+		        //appSmHandleInternalPairHandset();
+				appSmPairHandset();
+			}
+		}
+	}
+
+	if(ruleConnectGetReason() == RULE_CONNECT_USER)
+	{
+		DEBUG_LOG("rule Connect Reason = rule connect user!");
+		appSmSetRuleConnectUser(TRUE);
+	}
+	
+}
+
+
+#endif
 
 /*! \brief Connect A2DP and AVRCP to peer. */
 static void appSmHandleConnRulesConnectPeer(const CONN_RULES_CONNECT_PEER_T* crcp)
@@ -2329,6 +2385,15 @@ void appSmHandleMessage(Task task, MessageId id, Message message)
 			break;
 #endif
 
+#ifdef	SYNC_VOL
+		case SM_INTERNAL_SYNC_VOL:
+			if(appSmSyncVolGet())
+			{
+				appSmSyncVolSet(FALSE);
+				appAvVolumeSet(sm->volume, NULL);
+			}
+			break;
+#endif
         default:
             appHandleUnexpected(id);
             break;
@@ -2696,6 +2761,29 @@ void appSmSinglePeerConHandset(void)
 
 	/* Connect AVRCP and A2DP to handset */
 	appAvConnectHandset();
+}
+
+#endif
+
+#ifdef	SYNC_VOL
+bool appSmSyncVolGet(void)
+{
+	DEBUG_LOG("appSmSyncVolGet!");
+	smTaskData *sm = appGetSm();
+	return sm->vol_sync_flag;
+}
+
+void appSmSyncVolSet(bool value)
+{
+	DEBUG_LOG("appSmSyncVolSet!");
+	smTaskData *sm = appGetSm();
+	sm->vol_sync_flag = value;
+}
+
+void appSmSyncVolSendMessage(uint8 times)
+{
+	MessageCancelAll(appGetSmTask(), SM_INTERNAL_SYNC_VOL);
+	MessageSendLater(appGetSmTask(), SM_INTERNAL_SYNC_VOL, NULL, D_SEC(times));
 }
 
 #endif

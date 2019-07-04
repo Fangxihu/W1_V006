@@ -38,6 +38,9 @@ enum sm_internal_message_ids
 #ifdef	AUTO_POWER_OFF
 	SM_INTERNAL_TIMEOUT_POWER_OFF,				   /*!< Timeout when idle. */
 #endif
+#ifdef	SYNC_VOL
+	SM_INTERNAL_SYNC_VOL,				   /*!< Timeout when idle. */
+#endif
 };
 
 #endif /* _AV_HEADSET_SM_PRIVATE_H_ */

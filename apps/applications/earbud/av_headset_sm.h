@@ -197,11 +197,16 @@ typedef struct
 	bool rule_connect_user:1;				/*!< User initiated pairing */
 
 	reconnectState rec_state; 					/*!< Application state */
-	
 #endif
 #ifdef	AUTO_POWER_OFF
 	uint16 auto_power_off_times;
 #endif
+
+#ifdef	SYNC_VOL
+	bool vol_sync_flag:1;				/*!< User initiated pairing */
+	uint8	volume;
+#endif
+
 } smTaskData;
 
 /*! \brief Bitmask use to signal connect links in lock */
@@ -213,6 +218,14 @@ typedef struct
 #define appSmLockSetConnectedLinks() appGetSm()->lock |= APP_SM_LOCK_MASK_CONNECTED_LINKS
 /*! \brief Clear the connected links bit in the lock */
 #define appSmLockClearConnectedLinks() appGetSm()->lock &= ~APP_SM_LOCK_MASK_CONNECTED_LINKS
+
+
+#ifdef	SYNC_VOL
+extern bool appSmSyncVolGet(void);
+extern void appSmSyncVolSet(bool value);
+extern void appSmSyncVolSendMessage(uint8 times);
+
+#endif
 
 /*! \brief Change application state.
 
@@ -294,6 +307,8 @@ extern reconnectState ReconnectGetState(void);
 
 extern bool appSmRuleConnectUser(void);
 extern void appSmSetRuleConnectUser(bool value);
+
+extern void appSmHandleConnRulesConnectHandsetUser(void);
 
 #endif
 

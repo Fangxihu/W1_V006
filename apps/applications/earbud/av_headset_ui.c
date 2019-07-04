@@ -47,7 +47,7 @@ enum ui_internal_messages
 };
 
 #ifdef CHAIN_MIC_SPK
-extern uint8 mic_spk_flag=0;
+uint8 mic_spk_flag=0;
 #endif
 
 /*! At the end of every tone, add a short rest to make sure tone mxing in the DSP doens't truncate the tone */
@@ -893,8 +893,10 @@ void appUiPlayPromptCore(voicePromptName prompt, bool interruptible,
 /*! \brief Report a generic error on LEDs and play tone */
 void appUiError(void)
 {
+#if 0
     appUiPlayTone(app_tone_error);
     appLedSetPattern(app_led_pattern_error, LED_PRI_EVENT);
+#endif
 }
 
 /*! \brief Play HFP error tone and set LED error pattern.
@@ -1006,8 +1008,11 @@ static void appUiMultiTapHandle(void)
 	switch(key_count)
 	{
 		case 1:
+			{
+			chargerConnectionState is_connected = appChargerIsConnected();
 			DEBUG_LOG("key single!!!");
-			if (appSmIsOutOfCase())
+			//if (appSmIsOutOfCase())
+			if(is_connected == CHARGER_DISCONNECTED)
 			{
                 /* If incoming voice call, accept */
                 /*else */if (appHfpIsCallIncoming())
@@ -1028,6 +1033,7 @@ static void appUiMultiTapHandle(void)
                     appUiAvConnect();
                 }
             }
+			}
 		break;
 			
 		case 2:
@@ -1084,6 +1090,7 @@ static void appUiMultiTapHandle(void)
 						{
 						appKymerLoopbackStart();
 						mic_spk_flag = 1;
+						appScoFwdLoopbackStart();
 						}
 						else
 						{
@@ -1241,6 +1248,8 @@ static void appUiHandleMessage(Task task, MessageId id, Message message)
 		
 				hfp_change = (appConfigGetHfpVolumeStep() * num_steps);
 				av_change = (appConfigGetAvVolumeStep() * num_steps);
+				
+				theUi->vol_change_flag = TRUE;
 
 				if (appHfpIsScoActive())
 				{
@@ -1267,6 +1276,7 @@ static void appUiHandleMessage(Task task, MessageId id, Message message)
 				else
 				{
 					appUiHfpError(FALSE);
+					theUi->vol_change_flag = FALSE;
 				}
 				}
         	}
@@ -1291,7 +1301,9 @@ static void appUiHandleMessage(Task task, MessageId id, Message message)
 			hfp_change_vol = (appConfigGetHfpVolumeStep() * vol_dir);
 			av_change_vol = (appConfigGetAvVolumeStep() * vol_dir);
 			
-            DEBUG_LOG("APP_MFB_BUTTON_3_SECOND");
+			theUi->vol_change_flag = FALSE;
+			
+            DEBUG_LOG("APP_MFB_BUTTON_2_SECOND");
 			if (appHfpIsScoActive())
 				appHfpVolumeStop(hfp_change_vol);
 			else if (appScoFwdIsReceiving())
@@ -1314,6 +1326,33 @@ static void appUiHandleMessage(Task task, MessageId id, Message message)
 #ifdef SYNC_FT_RESET
 			appScoFwdSyncFactoryResetSet(FALSE);
 #endif
+		if(theUi->vol_change_flag)
+		{
+			int16 vol_dir, hfp_change_vol, av_change_vol;
+			if(appConfigIsLeft())
+				vol_dir = -1; 		
+			else
+				vol_dir = 1;	
+			hfp_change_vol = (appConfigGetHfpVolumeStep() * vol_dir);
+			av_change_vol = (appConfigGetAvVolumeStep() * vol_dir);
+			
+			theUi->vol_change_flag = FALSE;
+			
+            DEBUG_LOG("APP_MFB_BUTTON_2_SECOND");
+			if (appHfpIsScoActive())
+				appHfpVolumeStop(hfp_change_vol);
+			else if (appScoFwdIsReceiving())
+				appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
+#ifdef INCLUDE_AV
+			else if (appAvIsStreaming())
+				appAvVolumeStop(av_change_vol);
+#endif
+			else if (appHfpIsConnected())
+				appHfpVolumeStop(hfp_change_vol);
+			else if (appScoFwdIsConnected())
+				appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
+			/*! \todo why no else with UiHfpError() ? */
+        }
         }
         break;
 		
@@ -1336,6 +1375,33 @@ static void appUiHandleMessage(Task task, MessageId id, Message message)
 #ifdef SYNC_FT_RESET
 			appScoFwdSyncFactoryResetSet(FALSE);
 #endif
+			if(theUi->vol_change_flag)
+			{
+				int16 vol_dir, hfp_change_vol, av_change_vol;
+				if(appConfigIsLeft())
+					vol_dir = -1;		
+				else
+					vol_dir = 1;	
+				hfp_change_vol = (appConfigGetHfpVolumeStep() * vol_dir);
+				av_change_vol = (appConfigGetAvVolumeStep() * vol_dir);
+				
+				theUi->vol_change_flag = FALSE;
+				
+				DEBUG_LOG("APP_MFB_BUTTON_2_SECOND");
+				if (appHfpIsScoActive())
+					appHfpVolumeStop(hfp_change_vol);
+				else if (appScoFwdIsReceiving())
+					appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
+#ifdef INCLUDE_AV
+				else if (appAvIsStreaming())
+					appAvVolumeStop(av_change_vol);
+#endif
+				else if (appHfpIsConnected())
+					appHfpVolumeStop(hfp_change_vol);
+				else if (appScoFwdIsConnected())
+					appScoFwdVolumeStop(-appConfigGetHfpVolumeStep());
+				/*! \todo why no else with UiHfpError() ? */
+			}
 		}
 		break;
 		
@@ -1388,4 +1454,6 @@ void appUiInit(void)
 #ifdef INCLUDE_FTSINGLEPEER
 	theUi->ftsingle_flag = FALSE;
 #endif
+	theUi->vol_change_flag = FALSE;
+
 }

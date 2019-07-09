@@ -551,41 +551,6 @@ static ruleAction ruleConnectBatteryVoltage(ruleConnectReason reason)
     }
 }
 
-/*为了处理同时拿出来不会连的问题*/
-#if 0//ef RECONNECT_HANDSET
-static ruleAction ruleUserBatteryVoltage(void)
-{
-    uint16 battery_level, peer_battery_level;
-
-    appPeerSyncGetPeerBatteryLevel(&battery_level, &peer_battery_level);
-    RULE_LOGF("ruleUserBatteryVoltage, battery %u, peer battery %u", battery_level, peer_battery_level);
-	
-    if (battery_level > peer_battery_level)
-    {
-        RULE_LOG("ruleConnectBatteryVoltage, run as our battery is higher");
-        return RULE_ACTION_RUN;
-    }
-    else if (battery_level == peer_battery_level)
-    {
-        if (appConfigIsLeft())
-        {
-            RULE_LOG("ruleConnectBatteryVoltage, equal, run as left earbud");
-            return RULE_ACTION_RUN;
-        }
-        else
-        {
-            RULE_LOG("ruleConnectBatteryVoltage, equal, ignore as right earbud");
-            return RULE_ACTION_IGNORE;
-        }
-    }
-    else
-    {
-            RULE_LOG("ruleConnectBatteryVoltage, ignore as our battery is lower");
-            return RULE_ACTION_IGNORE;
-    }
-}
-
-#endif
 
 /*! @brief Sub-rule to determine if Earbud should connect to standard handset
 */
@@ -1991,11 +1956,6 @@ static ruleAction ruleDisconnectPeer(void)
 static ruleAction ruleOutOfCaseAllowHandsetConnect(void)
 {
     RULE_LOG("ruleOutOfCaseAllowHandsetConnect, run as out of case");
-#if 0//def RECONNECT_HANDSET	
-	ReconnectSetState(RECONNECT_STATE_NULL);
-	/* Send peer sync */
-	appPeerSyncSend(FALSE);
-#endif
     return RULE_ACTION_RUN;
 }
 

@@ -63,13 +63,18 @@ static void appHfpHandleMessage(Task task, MessageId id, Message message);
 
 #ifdef BATTERY_COMPENSATION
 
+//const char StartBatteryLevel[] = "AT+XAPL=05AC-1702-0100,7\r";
+
 static void HfpAccevIndStatusRequest(void)
 {  
     char at_cmd[25];  
+	
+	//HfpAtCmdRequest(hfp_primary_link, StartBatteryLevel);
+	//HfpAtCmdRequest(hfp_primary_link, BatteryLevel8);
 
-    snprintf(at_cmd, sizeof(at_cmd), "AT+IPHONEACCEV=1,1,%d\r",appBatteryGetPercentHFP()/10);  
+    snprintf(at_cmd, sizeof(at_cmd), "AT+IPHONEACCEV=1,1,%d\r",(appBatteryGetPercentHFP() - 1)/10);  
 
-    HfpAtCmdRequest(1, at_cmd);  
+    HfpAtCmdRequest(hfp_primary_link, at_cmd);  
 }  
 #endif
 
@@ -223,6 +228,10 @@ static void appHfpExitConnectingRemote(void)
 static void appHfpEnterConnected(void)
 {
     DEBUG_LOG("appHfpEnterConnected");
+	
+#ifdef AUTO_PAIRIING
+    appGetHfp()->auto_pairing_flag = FALSE;
+#endif
 
     /* Update most recent connected device */
     appDeviceUpdateMruDevice(&appGetHfp()->ag_bd_addr);
@@ -257,6 +266,13 @@ static void appHfpEnterConnected(void)
     MAKE_HFP_MESSAGE(APP_HFP_CONNECTED_IND);
     message->bd_addr = appGetHfp()->ag_bd_addr;
     appTaskListMessageSend(appGetHfp()->status_notify_list, APP_HFP_CONNECTED_IND, message);
+	
+#ifdef BATTERY_COMPENSATION
+		HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, appBatteryGetPercentHFP());
+		HfpAccevIndStatusRequest();
+#else
+		HfpBievIndStatusRequest(hfp_primary_link, hf_battery_level, appBatteryGetPercent());
+#endif
 
 #if defined(HFP_CONNECT_AUTO_ANSWER) || defined(HFP_CONNECT_AUTO_TRANSFER)
     if (appGetHfp()->profile != hfp_headset_profile)
@@ -283,6 +299,8 @@ static void appHfpEnterConnected(void)
 #endif            
     }
 #endif
+
+
 }
 
 /*! \brief Exit 'connected' state
@@ -852,17 +870,18 @@ static void appHfpHandleHfpSlcDisconnectIndication(const HFP_SLC_DISCONNECT_IND_
 						if (appConfigIsLeft())
 						{
 							DEBUG_LOG("TWS+ handset");
+							appGetHfp()->auto_pairing_flag = TRUE;
 							appSmPairHandset();
 						}
 					}
 					else
 					{
 						DEBUG_LOG("TWS handset");
+						appGetHfp()->auto_pairing_flag = TRUE;
 						appSmPairHandset();
 					}
 				}
 #endif
-
             }
 
             /* Move to disconnected state */
@@ -2198,6 +2217,10 @@ void appHfpInit(void)
     appGetHfp()->hfp_lock = 0;
     appGetHfp()->disconnect_reason = APP_HFP_CONNECT_FAILED;
     appHfpSetState(HFP_STATE_INITIALISING_HFP);
+	
+#ifdef AUTO_PAIRIING
+    appGetHfp()->auto_pairing_flag = FALSE;
+#endif
 
     /* by default this module handles setting volume in kymera */
     appGetHfp()->sco_forward_handling_volume = FALSE;

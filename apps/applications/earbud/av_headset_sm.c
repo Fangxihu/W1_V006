@@ -1949,8 +1949,11 @@ static void appSmHandleHfpScoDisconnectedInd(void)
 
 static void appSmHandleInternalPairHandset(void)
 {
-    if ((appSmStateIsIdle(appGetState()) && (!appPeerSyncUserPeerIsPairing())) || (appSmReconnectAndPairing()) || (appUiFTSingleGet()))
+    if ((appSmStateIsIdle(appGetState()) && (!appPeerSyncUserPeerIsPairing())) || (appGetHfp()->auto_pairing_flag) || (appSmReconnectAndPairing()) || (appUiFTSingleGet()))
     {
+#ifdef AUTO_PAIRIING
+		appGetHfp()->auto_pairing_flag = FALSE;
+#endif
         appSmSetUserPairing();
         appSetState(APP_STATE_HANDSET_PAIRING);
     }

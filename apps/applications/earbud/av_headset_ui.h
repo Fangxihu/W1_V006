@@ -224,7 +224,7 @@ extern const ringtone_note app_tone_av_link_loss[];
  
 /*! \brief Play HFP voice dial tone */
 #define appUiHfpVoiceDial() \
-    appUiPlayTone(app_tone_hfp_voice_dial)
+    /*appUiPlayTone(app_tone_hfp_voice_dial)*/
 
 /*! \brief Play HFP voice dial disable tone */
 #define appUiHfpVoiceDialDisable() \
@@ -290,7 +290,7 @@ extern const ringtone_note app_tone_av_link_loss[];
 //#else
 /*! \brief Play HFP ring indication tone */
 #define appUiHfpRing(caller_id) \
-    appUiPlayTone(app_tone_hfp_ring)
+    /*appUiPlayTone(app_tone_hfp_ring)*/
 #endif
 
 /*! \brief Handle caller ID */

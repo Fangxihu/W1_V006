@@ -145,6 +145,7 @@ typedef struct
 
 #ifdef AUTO_PAIRIING
 	appHfpDisconnectReason	reason;
+	bool		auto_pairing_flag;
 #endif
 } hfpTaskData;
 
